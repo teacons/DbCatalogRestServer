@@ -27,13 +27,15 @@ class BookGenreService(val db: BookGenreRepository) {
 @Service
 class BookSeriesService(val db: BookSeriesRepository) {
 
-    fun getBookSeries(id: Long): Optional<BookSeries> = db.findById(id)
+    fun findById(id: Long): Optional<BookSeries> = db.findById(id)
 
 }
 
 @Service
 class BookService(val db: BookRepository) {
 
-    fun getBook(id: Long): Optional<Book> = db.findById(id)
+    fun findById(id: Long): Optional<Book> = db.findById(id)
+
+    fun findAll(): MutableIterable<Book> = db.findAll()
 
 }

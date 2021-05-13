@@ -46,11 +46,31 @@ class BookGenreController(val service: BookGenreService) {
 class BookController(val bookService: BookService, val bookSeriesService: BookSeriesService) {
 
     @GetMapping("/{id}")
-    fun getBook(@PathVariable id: Long): BookWithSeries {
-        val book = bookService.getBook(id).get()
-        val bookSeries = bookSeriesService.getBookSeries(book.bookSeriesId).get()
-        val bookSeriesWithoutBooks = BookSeriesWithoutBooks(bookSeries.id, bookSeries.name, bookSeries.description)
+    fun getBookById(@PathVariable id: Long): BookWithSeries {
+
+        val book = bookService.findById(id).get()
+        val bookSeriesWithoutBooks = if (book.bookSeriesId != null) {
+            val bookSeries = bookSeriesService.findById(book.bookSeriesId).get()
+
+            BookSeriesWithoutBooks(bookSeries.id, bookSeries.name, bookSeries.description)
+        } else null
         return BookWithSeries(book.id, book.name, book.year, book.description, book.poster, bookSeriesWithoutBooks)
+    }
+
+    @GetMapping
+    fun getBooks(): List<BookWithSeries> {
+        val booksWithSeries = mutableListOf<BookWithSeries>()
+
+        bookService.findAll().forEach {
+            val bookSeriesWithoutBooks = if (it.bookSeriesId != null) {
+                val bookSeries = bookSeriesService.findById(it.bookSeriesId).get()
+
+                BookSeriesWithoutBooks(bookSeries.id, bookSeries.name, bookSeries.description)
+            } else null
+            booksWithSeries.add(BookWithSeries(it.id, it.name, it.year, it.description, it.poster, bookSeriesWithoutBooks))
+        }
+
+        return booksWithSeries
     }
 
 }

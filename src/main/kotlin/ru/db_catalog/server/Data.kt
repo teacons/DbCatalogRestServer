@@ -20,7 +20,7 @@ data class Book(
     val year: Int,
     val description: String,
     val poster: String?,
-    val bookSeriesId: Long
+    val bookSeriesId: Long?
 )
 
 @Table("book_series")
@@ -37,7 +37,7 @@ data class BookWithSeries(
     val year: Int,
     val description: String,
     val poster: String?,
-    val bookSeries: BookSeriesWithoutBooks
+    val bookSeries: BookSeriesWithoutBooks?
 )
 
 data class BookSeriesWithoutBooks(val id: Long?, val name: String, val description: String?)
