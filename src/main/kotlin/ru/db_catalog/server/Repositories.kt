@@ -1,31 +1,22 @@
 package ru.db_catalog.server
 
-import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.repository.CrudRepository
+import org.springframework.stereotype.Repository
 
-interface MusicGenreRepository : CrudRepository<MusicGenre, String> {
+@Repository
+interface MusicGenreRepository : CrudRepository<MusicGenre, Long>
 
-    @Query("select * from db.music_genre")
-    fun getMusicGenres(): List<MusicGenre>
+@Repository
+interface FilmGenreRepository : CrudRepository<FilmGenre, Long>
 
-}
+@Repository
+interface BookGenreRepository : CrudRepository<BookGenre, Long>
 
-interface FilmGenreRepository : CrudRepository<FilmGenre, String> {
-
-    @Query("select * from db.film_genre")
-    fun getFilmGenres(): List<FilmGenre>
-
-}
-
-interface BookGenreRepository : CrudRepository<BookGenre, String> {
-
-    @Query("select * from db.book_genre")
-    fun getBookGenres(): List<BookGenre>
-
-}
-
-
+@Repository
 interface BookRepository : CrudRepository<Book, Long>
 
-
+@Repository
 interface BookSeriesRepository : CrudRepository<BookSeries, Long>
+
+@Repository
+interface PeopleRepository : CrudRepository<People, Long>

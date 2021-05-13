@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.*
 
 @SpringBootApplication
 class ServerApplication
@@ -19,7 +20,10 @@ fun main(args: Array<String>) {
 class MusicGenreController(val service: MusicGenreService) {
 
     @GetMapping
-    fun getMusicGenres(): List<MusicGenre> = service.getMusicGenres()
+    fun getMusicGenres(): MutableIterable<MusicGenre> = service.getMusicGenres()
+
+    @GetMapping("/{id}")
+    fun getMusicGenre(@PathVariable id: Long): Optional<MusicGenre> = service.getMusicGenre(id)
 
 }
 
@@ -28,7 +32,10 @@ class MusicGenreController(val service: MusicGenreService) {
 class FilmGenreController(val service: FilmGenreService) {
 
     @GetMapping
-    fun getFilmGenres(): List<FilmGenre> = service.getFilmGenres()
+    fun getFilmGenres(): MutableIterable<FilmGenre> = service.getFilmGenres()
+
+    @GetMapping("/{id}")
+    fun getFilmGenre(@PathVariable id: Long): Optional<FilmGenre> = service.getFilmGenre(id)
 
 }
 
@@ -37,40 +44,66 @@ class FilmGenreController(val service: FilmGenreService) {
 class BookGenreController(val service: BookGenreService) {
 
     @GetMapping
-    fun getBookGenres(): List<BookGenre> = service.getBookGenres()
+    fun getBookGenres(): MutableIterable<BookGenre> = service.getBookGenres()
+
+    @GetMapping("/{id}")
+    fun getBookGenre(@PathVariable id: Long): Optional<BookGenre> = service.getBookGenre(id)
 
 }
 
 @RestController
 @RequestMapping("/api/book")
-class BookController(val bookService: BookService, val bookSeriesService: BookSeriesService) {
+class BookController(
+    val bookService: BookService,
+    val bookSeriesService: BookSeriesService,
+    val bookGenreService: BookGenreService,
+    val peopleService: PeopleService
+) {
 
     @GetMapping("/{id}")
-    fun getBookById(@PathVariable id: Long): BookWithSeries {
-
-        val book = bookService.findById(id).get()
-        val bookSeriesWithoutBooks = if (book.bookSeriesId != null) {
-            val bookSeries = bookSeriesService.findById(book.bookSeriesId).get()
-
-            BookSeriesWithoutBooks(bookSeries.id, bookSeries.name, bookSeries.description)
-        } else null
-        return BookWithSeries(book.id, book.name, book.year, book.description, book.poster, bookSeriesWithoutBooks)
-    }
+    fun getBookById(@PathVariable id: Long): BookWithSeries = prepareBook(bookService.findById(id).get())
 
     @GetMapping
     fun getBooks(): List<BookWithSeries> {
         val booksWithSeries = mutableListOf<BookWithSeries>()
 
         bookService.findAll().forEach {
-            val bookSeriesWithoutBooks = if (it.bookSeriesId != null) {
-                val bookSeries = bookSeriesService.findById(it.bookSeriesId).get()
-
-                BookSeriesWithoutBooks(bookSeries.id, bookSeries.name, bookSeries.description)
-            } else null
-            booksWithSeries.add(BookWithSeries(it.id, it.name, it.year, it.description, it.poster, bookSeriesWithoutBooks))
+            booksWithSeries.add(prepareBook(it))
         }
 
         return booksWithSeries
+    }
+
+    fun prepareBook(book: Book): BookWithSeries {
+        val bookSeriesWithoutBooks = if (book.bookSeriesId != null) {
+            val bookSeries = bookSeriesService.findById(book.bookSeriesId).get()
+
+            BookSeriesWithoutBooks(bookSeries.id, bookSeries.name, bookSeries.description)
+        } else null
+
+        val bookGenres = mutableSetOf<BookGenre>()
+
+        book.bookGenres.forEach {
+            bookGenres.add(bookGenreService.getBookGenre(it.bookGenreId).get())
+        }
+
+        val authors = mutableSetOf<People>()
+
+        book.authors.forEach{
+            authors.add(peopleService.findById(it.peopleId).get())
+        }
+
+
+        return BookWithSeries(
+            book.id,
+            book.name,
+            book.year,
+            book.description,
+            book.poster,
+            bookGenres,
+            authors,
+            bookSeriesWithoutBooks
+        )
     }
 
 }

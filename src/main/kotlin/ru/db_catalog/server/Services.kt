@@ -6,21 +6,27 @@ import java.util.*
 @Service
 class MusicGenreService(val db: MusicGenreRepository) {
 
-    fun getMusicGenres(): List<MusicGenre> = db.getMusicGenres()
+    fun getMusicGenres(): MutableIterable<MusicGenre> = db.findAll()
+
+    fun getMusicGenre(id: Long): Optional<MusicGenre> = db.findById(id)
 
 }
 
 @Service
 class FilmGenreService(val db: FilmGenreRepository) {
 
-    fun getFilmGenres(): List<FilmGenre> = db.getFilmGenres()
+    fun getFilmGenres(): MutableIterable<FilmGenre> = db.findAll()
+
+    fun getFilmGenre(id: Long): Optional<FilmGenre> = db.findById(id)
 
 }
 
 @Service
 class BookGenreService(val db: BookGenreRepository) {
 
-    fun getBookGenres(): List<BookGenre> = db.getBookGenres()
+    fun getBookGenres(): MutableIterable<BookGenre> = db.findAll()
+
+    fun getBookGenre(id: Long): Optional<BookGenre> = db.findById(id)
 
 }
 
@@ -37,5 +43,14 @@ class BookService(val db: BookRepository) {
     fun findById(id: Long): Optional<Book> = db.findById(id)
 
     fun findAll(): MutableIterable<Book> = db.findAll()
+
+}
+
+@Service
+class PeopleService(val db: PeopleRepository) {
+
+    fun findById(id: Long): Optional<People> = db.findById(id)
+
+    fun findAll(): MutableIterable<People> = db.findAll()
 
 }
