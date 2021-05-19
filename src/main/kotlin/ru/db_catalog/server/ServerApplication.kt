@@ -2,10 +2,17 @@ package ru.db_catalog.server
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import ru.db_catalog.server.book.Book
+import ru.db_catalog.server.book.BookGenre
+import ru.db_catalog.server.book.Content
+import ru.db_catalog.server.book.ContentSimple
+import ru.db_catalog.server.film.Film
+import ru.db_catalog.server.music.Music
+import ru.db_catalog.server.music.MusicGenre
+import ru.db_catalog.server.top.BookTop
+import ru.db_catalog.server.user.User
+import java.sql.Timestamp
 import java.util.*
 
 @SpringBootApplication
@@ -55,55 +62,218 @@ class BookGenreController(val service: BookGenreService) {
 @RequestMapping("/api/book")
 class BookController(
     val bookService: BookService,
-    val bookSeriesService: BookSeriesService,
     val bookGenreService: BookGenreService,
     val peopleService: PeopleService
 ) {
 
     @GetMapping("/{id}")
-    fun getBookById(@PathVariable id: Long): BookWithSeries = prepareBook(bookService.findById(id).get())
-
-    @GetMapping
-    fun getBooks(): List<BookWithSeries> {
-        val booksWithSeries = mutableListOf<BookWithSeries>()
-
-        bookService.findAll().forEach {
-            booksWithSeries.add(prepareBook(it))
-        }
-
-        return booksWithSeries
+    fun getBook(@PathVariable id: Long): Content {
+        return prepareBook(bookService.findById(id).get())
     }
 
-    fun prepareBook(book: Book): BookWithSeries {
-        val bookSeriesWithoutBooks = if (book.bookSeriesId != null) {
-            val bookSeries = bookSeriesService.findById(book.bookSeriesId).get()
+    @GetMapping
+    fun getBooks(): Set<ContentSimple> = bookService.findAllIdName()
 
-            BookSeriesWithoutBooks(bookSeries.id, bookSeries.name, bookSeries.description)
-        } else null
+    fun prepareBook(book: Book): Content {
+//        val bookSeriesWithoutBooks = if (book.bookSeriesId != null) {
+//            val bookSeries = bookSeriesService.findById(book.bookSeriesId).get()
+//
+//            BookSeriesWithoutBooks(bookSeries.id, bookSeries.name, bookSeries.description)
+//        } else null
 
-        val bookGenres = mutableSetOf<BookGenre>()
+        var rating = bookService.getRating(book.id)
+
+        if (rating == null) rating = 0.0
+
+        val genres = mutableSetOf<String>()
 
         book.bookGenres.forEach {
-            bookGenres.add(bookGenreService.getBookGenre(it.bookGenreId).get())
+            genres.add(bookGenreService.getBookGenre(it.bookGenreId).get().name)
         }
 
-        val authors = mutableSetOf<People>()
+//        val authors = mutableSetOf<People>()
 
-        book.authors.forEach{
-            authors.add(peopleService.findById(it.peopleId).get())
-        }
+//        book.authors.forEach {
+//            authors.add(peopleService.findById(it.peopleId).get())
+//        }
+
+//        val tops = mutableSetOf<BookTopWithoutBooks>()
+//
+//        bookTopService.findByBookId(book.id).forEach {
+//            tops.add(BookTopWithoutBooks(it.id, it.name, bookTopService.findPositionInTop(it.id, book.id)))
+//        }
 
 
-        return BookWithSeries(
+        return Content(
             book.id,
             book.name,
             book.year,
-            book.description,
             book.poster,
-            bookGenres,
-            authors,
-            bookSeriesWithoutBooks
+            rating,
+            genres,
         )
+    }
+
+}
+
+
+@RestController
+@RequestMapping("/api/music")
+class MusicController(
+    val musicService: MusicService,
+    val musicGenreService: MusicGenreService,
+    val musicAlbumService: MusicAlbumService
+) {
+
+    @GetMapping("/{id}")
+    fun getMusic(@PathVariable id: Long): Content = prepareMusic(musicService.findById(id).get())
+
+
+    @GetMapping
+    fun getMusics(): Set<ContentSimple> = musicService.findAllIdName()
+
+    fun prepareMusic(music: Music): Content {
+
+        var rating = musicService.getRating(music.id)
+
+        if (rating == null) rating = 0.0
+
+        val genres = mutableSetOf<String>()
+
+        music.musicGenres.forEach {
+            genres.add(musicGenreService.getMusicGenre(it.musicGenreId).get().name)
+        }
+
+        val poster = music.albums.firstOrNull()?.let { musicAlbumService.findById(it.musicAlbumId).get().poster }
+
+        return Content(
+            music.id,
+            music.name,
+            music.year,
+            poster,
+            rating,
+            genres,
+        )
+    }
+}
+
+@RestController
+@RequestMapping("/api/film")
+class FilmController(val filmService: FilmService, val filmGenreService: FilmGenreService) {
+
+    @GetMapping("/{id}")
+    fun getFilm(@PathVariable id: Long): Content = prepareFilm(filmService.findById(id).get())
+
+    @GetMapping
+    fun getFilms(): Set<ContentSimple> = filmService.findAllIdName()
+
+    fun prepareFilm(film: Film): Content {
+
+        var rating = filmService.getRating(film.id)
+
+        if (rating == null) rating = 0.0
+
+        val genres = mutableSetOf<String>()
+
+        film.filmGenres.forEach {
+            genres.add(filmGenreService.getFilmGenre(it.filmGenreId).get().name)
+        }
+
+        return Content(
+            film.id,
+            film.name,
+            film.year,
+            film.poster,
+            rating,
+            genres,
+        )
+    }
+}
+
+
+@RestController
+@RequestMapping("/api/top")
+class TopController(val bookTopService: BookTopService) {
+
+    @GetMapping("/book")
+    fun getBookTops(): MutableIterable<BookTop> {
+        return bookTopService.findAll()
+
+    }
+
+    @GetMapping("/book/{id}")
+    fun getBookTop(@PathVariable id: Long): Optional<BookTop> {
+        return bookTopService.findById(id)
+    }
+
+}
+
+@RestController
+@RequestMapping("/api/user")
+class UserController(val userService: UserService) {
+
+    @GetMapping("/auth")
+    fun authUser(
+        @RequestParam(value = "username", required = true)
+        username: String,
+        @RequestParam(value = "password", required = true)
+        password: String
+    ): Map<String, Long?> {
+        val user = userService.findByUsername(username)
+        return if (user != null && user.password == password) mapOf(Pair("uid", user.id))
+        else mapOf(Pair("uid", null))
+    }
+
+    @PostMapping("/reg")
+    fun registerUser(
+        @RequestParam(value = "username", required = true)
+        username: String,
+        @RequestParam(value = "password", required = true)
+        password: String,
+        @RequestParam(value = "email", required = true)
+        email: String
+    ): Map<String, String?> {
+        val answer = mutableMapOf<String, String?>()
+        when {
+            userService.existsUserByUsername(username) -> {
+                answer["Code"] = "1"
+                answer["UserId"] = null
+                return answer
+            }
+            username.length > 20 -> {
+                answer["Code"] = "2"
+                answer["UserId"] = null
+                return answer
+            }
+            userService.existsUserByEmail(email) -> {
+                answer["Code"] = "3"
+                answer["UserId"] = null
+                return answer
+            }
+            password.length > 32 -> {
+                answer["Code"] = "4"
+                answer["UserId"] = null
+                return answer
+            }
+            password.length < 6 -> {
+                answer["Code"] = "5"
+                answer["UserId"] = null
+                return answer
+            }
+            else -> {
+                return try {
+                    val user = User(null, username, password, email, Timestamp(Calendar.getInstance().timeInMillis))
+                    val savedUser = userService.save(user)
+                    answer["Code"] = "0"
+                    answer["UserId"] = savedUser.id.toString()
+                    answer
+                } catch (e: Exception) {
+                    answer["Code"] = "666"
+                    answer["UserId"] = null
+                    answer
+                }
+            }
+        }
     }
 
 }
