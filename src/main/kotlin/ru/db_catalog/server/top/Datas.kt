@@ -14,8 +14,6 @@ data class BookTop(
 @Table("top_has_book")
 data class BookTopRef(val bookId: Long, val position: Int)
 
-data class TopIdName(val id: Long, val name: String)
-
 @Table("top")
 data class FilmTop(
     @Id val id: Long, val name: String,
@@ -35,3 +33,6 @@ data class MusicTop(
 
 @Table("top_has_music")
 data class MusicTopRef(val musicId: Long, val position: Int)
+
+data class TopIdName(val id: Long, val name: String)
+

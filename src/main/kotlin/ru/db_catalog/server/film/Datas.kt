@@ -6,7 +6,6 @@ import org.springframework.data.relational.core.mapping.Table
 import ru.db_catalog.server.PeopleWithFunction
 import ru.db_catalog.server.book.Book
 import ru.db_catalog.server.book.BookIdName
-import ru.db_catalog.server.music.Music
 import ru.db_catalog.server.music.MusicIdName
 import ru.db_catalog.server.top.TopIdName
 
@@ -65,3 +64,6 @@ data class FilmForAnswer(
 )
 
 data class FilmSeriesIdName(val id: Long, val name: String)
+
+@Table("film_genre")
+data class FilmGenre(@Id val id: Long, val name: String, val description: String)

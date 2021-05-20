@@ -3,7 +3,7 @@ package ru.db_catalog.server.user
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
-import ru.db_catalog.server.FilmGenre
+import ru.db_catalog.server.film.FilmGenre
 import ru.db_catalog.server.book.Book
 import ru.db_catalog.server.book.BookGenre
 import ru.db_catalog.server.film.Film
@@ -33,30 +33,6 @@ data class User(
     @MappedCollection(idColumn = "user_id")
     val viewedMusic: MutableSet<UserViewedMusicRef> = mutableSetOf(),
 ) {
-
-    fun addLikedBookGenre(bookGenre: BookGenre) {
-        likedBookGenres.add(UserBookGenreRef(bookGenre.id))
-    }
-
-    fun addLikedFilmGenre(filmGenre: FilmGenre) {
-        likedFilmGenres.add(UserFilmGenreRef(filmGenre.id))
-    }
-
-    fun addLikedMusicGenre(musicGenre: MusicGenre) {
-        likedMusicGenres.add(UserMusicGenreRef(musicGenre.id))
-    }
-
-    fun addViewedBook(book: Book) {
-        viewedBook.add(UserViewedBookRef(book.id))
-    }
-
-    fun addViewedFilm(film: Film) {
-        viewedFilm.add(UserViewedFilmRef(film.id))
-    }
-
-    fun addViewedMusic(music: Music) {
-        viewedMusic.add(UserViewedMusicRef(music.id))
-    }
 
 }
 

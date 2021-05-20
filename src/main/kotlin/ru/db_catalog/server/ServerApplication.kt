@@ -6,15 +6,11 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.db_catalog.server.book.*
-import ru.db_catalog.server.film.Film
-import ru.db_catalog.server.film.FilmForAnswer
-import ru.db_catalog.server.film.FilmSeriesIdName
+import ru.db_catalog.server.film.*
 import ru.db_catalog.server.music.*
-import ru.db_catalog.server.top.BookTop
-import ru.db_catalog.server.top.FilmTop
-import ru.db_catalog.server.top.MusicTop
-import ru.db_catalog.server.top.TopIdName
+import ru.db_catalog.server.top.*
 import ru.db_catalog.server.user.User
+import ru.db_catalog.server.user.UserService
 import java.sql.Timestamp
 import java.util.*
 import javax.servlet.http.HttpServletResponse
@@ -84,7 +80,7 @@ class BookController(
     }
 
     @GetMapping
-    fun getBooks(): Set<ContentSimple> = bookService.findAllIdName()
+    fun getBooks(): Set<ContentIdName> = bookService.findAllIdName()
 
     fun prepareBook(book: Book, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
@@ -167,7 +163,7 @@ class MusicController(
 
 
     @GetMapping
-    fun getMusics(): Set<ContentSimple> = musicService.findAllIdName()
+    fun getMusics(): Set<ContentIdName> = musicService.findAllIdName()
 
     fun prepareMusic(music: Music, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
@@ -250,7 +246,7 @@ class FilmController(
     ): ResponseEntity<Any> = prepareFilm(filmService.findById(id).get(), expanded, userId)
 
     @GetMapping
-    fun getFilms(): Set<ContentSimple> = filmService.findAllIdName()
+    fun getFilms(): Set<ContentIdName> = filmService.findAllIdName()
 
     fun prepareFilm(film: Film, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
