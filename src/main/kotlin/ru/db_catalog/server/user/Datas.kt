@@ -53,3 +53,5 @@ data class UserViewedFilmRef(val filmId: Long)
 
 @Table("user_viewed_music")
 data class UserViewedMusicRef(val musicId: Long)
+
+data class UserRegisterAnswer(val code: Long, val userId: Long?)

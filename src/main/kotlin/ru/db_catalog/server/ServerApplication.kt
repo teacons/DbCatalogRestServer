@@ -10,6 +10,7 @@ import ru.db_catalog.server.film.*
 import ru.db_catalog.server.music.*
 import ru.db_catalog.server.top.*
 import ru.db_catalog.server.user.User
+import ru.db_catalog.server.user.UserRegisterAnswer
 import ru.db_catalog.server.user.UserService
 import java.sql.Timestamp
 import java.util.*
@@ -402,45 +403,31 @@ class UserController(val userService: UserService) {
         password: String,
         @RequestParam(value = "email", required = true)
         email: String
-    ): Map<String, String?> {
-        val answer = mutableMapOf<String, String?>()
+    ): UserRegisterAnswer {
         when {
             userService.existsUserByUsername(username) -> {
-                answer["Code"] = "1"
-                answer["UserId"] = null
-                return answer
+                return UserRegisterAnswer(1, null)
             }
             username.length > 20 -> {
-                answer["Code"] = "2"
-                answer["UserId"] = null
-                return answer
+                return UserRegisterAnswer(2, null)
             }
             userService.existsUserByEmail(email) -> {
-                answer["Code"] = "3"
-                answer["UserId"] = null
-                return answer
+                return UserRegisterAnswer(3, null)
             }
             password.length > 32 -> {
-                answer["Code"] = "4"
-                answer["UserId"] = null
-                return answer
+                return UserRegisterAnswer(4, null)
             }
             password.length < 6 -> {
-                answer["Code"] = "5"
-                answer["UserId"] = null
-                return answer
+                return UserRegisterAnswer(5, null)
             }
             else -> {
                 return try {
                     val user = User(null, username, password, email, Timestamp(Calendar.getInstance().timeInMillis))
                     val savedUser = userService.save(user)
-                    answer["Code"] = "0"
-                    answer["UserId"] = savedUser.id.toString()
-                    answer
+                    UserRegisterAnswer(0, savedUser.id)
                 } catch (e: Exception) {
-                    answer["Code"] = "666"
-                    answer["UserId"] = null
-                    answer
+                    UserRegisterAnswer(666, null)
+
                 }
             }
         }
