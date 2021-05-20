@@ -54,7 +54,7 @@ data class FilmForAnswer(
     val rating: Double,
     val filmSeries: FilmSeriesIdName?,
     val book: BookIdName?,
-    val music: MutableSet<MusicIdName>,
+    val music: Set<MusicIdName>,
     val peoples: Set<PeopleWithFunction>,
     val genres: Set<String>,
     val viewed: Boolean,
