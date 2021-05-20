@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import ru.db_catalog.server.People
+import ru.db_catalog.server.top.TopIdName
 
 @Table("book_genre")
 data class BookGenre(@Id val id: Long, val name: String, val description: String)
@@ -20,15 +21,7 @@ data class Book(
     val bookGenres: MutableSet<BookGenreRef> = mutableSetOf(),
     @MappedCollection(idColumn = "book_id")
     val authors: MutableSet<BookAuthorRef> = mutableSetOf()
-) {
-    fun addBookGenre(bookGenre: BookGenre) {
-        bookGenres.add(BookGenreRef(bookGenre.id))
-    }
-
-    fun addAuthor(author: People) {
-        authors.add(BookAuthorRef(author.id))
-    }
-}
+)
 
 @Table("book_series")
 data class BookSeries(
@@ -43,15 +36,22 @@ data class BookGenreRef(val bookGenreId: Long)
 @Table("book_has_people")
 data class BookAuthorRef(val peopleId: Long)
 
-
-data class Content(
+data class BookForAnswer(
     val id: Long,
     val name: String,
     val year: Int,
+    val description: String,
     val poster: String?,
     val rating: Double,
+    val bookSeries: BookSeriesIdName?,
+    val authors: Set<People>,
     val genres: Set<String>,
-
+    val viewed: Boolean,
+    val ratingUser: Double?,
+    val top: TopIdName?,
+    val topPosition: Int?
 )
 
-data class ContentSimple(val id: Long, val name: String)
+data class BookSeriesIdName(val id: Long, val name: String)
+
+data class BookIdName(val id: Long, val name: String)

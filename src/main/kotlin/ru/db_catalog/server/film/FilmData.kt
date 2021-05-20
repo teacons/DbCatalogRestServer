@@ -3,9 +3,12 @@ package ru.db_catalog.server.film
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
-import ru.db_catalog.server.FilmGenre
-import ru.db_catalog.server.People
+import ru.db_catalog.server.PeopleWithFunction
 import ru.db_catalog.server.book.Book
+import ru.db_catalog.server.book.BookIdName
+import ru.db_catalog.server.music.Music
+import ru.db_catalog.server.music.MusicIdName
+import ru.db_catalog.server.top.TopIdName
 
 @Table("film")
 data class Film(
@@ -15,22 +18,16 @@ data class Film(
     val duration: Int,
     val description: String,
     val poster: String?,
+    val filmSeriesId: Long?,
     @MappedCollection(idColumn = "id")
     val book: Book?,
     @MappedCollection(idColumn = "film_id")
     val filmGenres: MutableSet<FilmGenreRef> = mutableSetOf(),
-    @MappedCollection(idColumn = "people_id")
+    @MappedCollection(idColumn = "film_id")
     val peoples: MutableSet<FilmPeopleRef> = mutableSetOf(),
-) {
-    fun addFilmGenre(filmGenre: FilmGenre) {
-        filmGenres.add(FilmGenreRef(filmGenre.id))
-    }
-
-    fun addPeople(people: People) {
-        this.peoples.add(FilmPeopleRef(people.id))
-    }
-
-}
+    @MappedCollection(idColumn = "film_id")
+    val musics: MutableSet<FilmMusicRef> = mutableSetOf()
+)
 
 @Table("film_series")
 data class FilmSeries(
@@ -43,4 +40,28 @@ data class FilmSeries(
 data class FilmGenreRef(val filmGenreId: Long)
 
 @Table("film_has_people")
-data class FilmPeopleRef(val peopleId: Long)
+data class FilmPeopleRef(val peopleId: Long, val peopleFunctionId: Long)
+
+@Table("film_has_music")
+data class FilmMusicRef(val musicId: Long)
+
+data class FilmForAnswer(
+    val id: Long,
+    val name: String,
+    val year: Int,
+    val duration: Int,
+    val description: String,
+    val poster: String?,
+    val rating: Double,
+    val filmSeries: FilmSeriesIdName?,
+    val book: BookIdName?,
+    val music: MutableSet<MusicIdName>,
+    val peoples: Set<PeopleWithFunction>,
+    val genres: Set<String>,
+    val viewed: Boolean,
+    val ratingUser: Double?,
+    val top: TopIdName?,
+    val topPosition: Int?
+)
+
+data class FilmSeriesIdName(val id: Long, val name: String)

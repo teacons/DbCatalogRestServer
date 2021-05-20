@@ -3,6 +3,7 @@ package ru.db_catalog.server.music
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
+import ru.db_catalog.server.top.TopIdName
 
 @Table("music")
 data class Music(
@@ -16,19 +17,7 @@ data class Music(
     val artists: MutableSet<MusicAuthorRef> = mutableSetOf(),
     @MappedCollection(idColumn = "music_id")
     val albums: MutableSet<MusicAlbumRef> = mutableSetOf()
-) {
-    fun addMusicGenre(musicGenre: MusicGenre) {
-        musicGenres.add(MusicGenreRef(musicGenre.id))
-    }
-
-    fun addArtist(artist: Artist) {
-        this.artists.add(MusicAuthorRef(artist.id))
-    }
-
-    fun addAlbum(album: MusicAlbum) {
-        this.albums.add(MusicAlbumRef(album.id))
-    }
-}
+)
 
 @Table("music_has_music_genre")
 data class MusicGenreRef(val musicGenreId: Long)
@@ -52,4 +41,22 @@ data class MusicAlbum(
     val year: Int,
     val poster: String?,
 )
+
+data class MusicForAnswer(
+    val id: Long,
+    val name: String,
+    val year: Int,
+    val duration: Int,
+    val poster: String?,
+    val rating: Double,
+    val artists: Set<Artist>,
+    val albums: Set<MusicAlbum>,
+    val genres: Set<String>,
+    val viewed: Boolean,
+    val ratingUser: Double?,
+    val top: TopIdName?,
+    val topPosition: Int?
+)
+
+data class MusicIdName(val id: Long, val name: String)
 

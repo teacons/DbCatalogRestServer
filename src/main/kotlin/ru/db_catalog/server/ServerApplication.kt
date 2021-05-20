@@ -2,18 +2,22 @@ package ru.db_catalog.server
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import ru.db_catalog.server.book.Book
-import ru.db_catalog.server.book.BookGenre
-import ru.db_catalog.server.book.Content
-import ru.db_catalog.server.book.ContentSimple
+import ru.db_catalog.server.book.*
 import ru.db_catalog.server.film.Film
-import ru.db_catalog.server.music.Music
-import ru.db_catalog.server.music.MusicGenre
+import ru.db_catalog.server.film.FilmForAnswer
+import ru.db_catalog.server.film.FilmSeriesIdName
+import ru.db_catalog.server.music.*
 import ru.db_catalog.server.top.BookTop
+import ru.db_catalog.server.top.FilmTop
+import ru.db_catalog.server.top.MusicTop
+import ru.db_catalog.server.top.TopIdName
 import ru.db_catalog.server.user.User
 import java.sql.Timestamp
 import java.util.*
+import javax.servlet.http.HttpServletResponse
 
 @SpringBootApplication
 class ServerApplication
@@ -63,23 +67,26 @@ class BookGenreController(val service: BookGenreService) {
 class BookController(
     val bookService: BookService,
     val bookGenreService: BookGenreService,
-    val peopleService: PeopleService
+    val peopleService: PeopleService,
+    val bookSeriesService: BookSeriesService,
+    val bookTopService: BookTopService,
+    val userService: UserService
 ) {
 
     @GetMapping("/{id}")
-    fun getBook(@PathVariable id: Long): Content {
-        return prepareBook(bookService.findById(id).get())
+    fun getBook(
+        @PathVariable id: Long,
+        @RequestParam(value = "expanded", required = false) expanded: Boolean = false,
+        @RequestParam(value = "user_id", required = false) userId: Long?,
+        response: HttpServletResponse
+    ): ResponseEntity<Any> {
+        return prepareBook(bookService.findById(id).get(), expanded, userId)
     }
 
     @GetMapping
     fun getBooks(): Set<ContentSimple> = bookService.findAllIdName()
 
-    fun prepareBook(book: Book): Content {
-//        val bookSeriesWithoutBooks = if (book.bookSeriesId != null) {
-//            val bookSeries = bookSeriesService.findById(book.bookSeriesId).get()
-//
-//            BookSeriesWithoutBooks(bookSeries.id, bookSeries.name, bookSeries.description)
-//        } else null
+    fun prepareBook(book: Book, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
         var rating = bookService.getRating(book.id)
 
@@ -91,29 +98,51 @@ class BookController(
             genres.add(bookGenreService.getBookGenre(it.bookGenreId).get().name)
         }
 
-//        val authors = mutableSetOf<People>()
+        if (!expanded) {
+            return ResponseEntity(Content(book.id, book.name, book.year, book.poster, rating, genres), HttpStatus.OK)
+        } else {
+            if (userId == null) return ResponseEntity(HttpStatus.BAD_REQUEST)
+            val bookSeriesWithoutBooks = if (book.bookSeriesId != null) {
+                val bookSeries = bookSeriesService.findById(book.bookSeriesId).get()
 
-//        book.authors.forEach {
-//            authors.add(peopleService.findById(it.peopleId).get())
-//        }
+                BookSeriesIdName(bookSeries.id, bookSeries.name)
+            } else null
 
-//        val tops = mutableSetOf<BookTopWithoutBooks>()
-//
-//        bookTopService.findByBookId(book.id).forEach {
-//            tops.add(BookTopWithoutBooks(it.id, it.name, bookTopService.findPositionInTop(it.id, book.id)))
-//        }
+            val authors = mutableSetOf<People>()
 
+            book.authors.forEach {
+                authors.add(peopleService.findById(it.peopleId).get())
+            }
 
-        return Content(
-            book.id,
-            book.name,
-            book.year,
-            book.poster,
-            rating,
-            genres,
-        )
+            val viewed = userService.existsViewByUserIdBookId(userId, book.id)
+
+            val userRating = userService.getUserBookRating(userId, book.id)
+
+            val top = bookTopService.findByBookId(book.id).firstOrNull()
+            val topIdName = top?.let { TopIdName(it.id, it.name) }
+            val topPosition = top?.let { bookTopService.findPositionInTop(it.id, book.id) }
+
+            return ResponseEntity(
+                BookForAnswer(
+                    book.id,
+                    book.name,
+                    book.year,
+                    book.description,
+                    book.poster,
+                    rating,
+                    bookSeriesWithoutBooks,
+                    authors,
+                    genres,
+                    viewed,
+                    userRating,
+                    topIdName,
+                    topPosition
+                ), HttpStatus.OK
+            )
+
+        }
+
     }
-
 }
 
 
@@ -122,17 +151,25 @@ class BookController(
 class MusicController(
     val musicService: MusicService,
     val musicGenreService: MusicGenreService,
-    val musicAlbumService: MusicAlbumService
+    val musicAlbumService: MusicAlbumService,
+    val artistService: ArtistService,
+    val userService: UserService,
+    val musicTopService: MusicTopService
+
 ) {
 
     @GetMapping("/{id}")
-    fun getMusic(@PathVariable id: Long): Content = prepareMusic(musicService.findById(id).get())
+    fun getMusic(
+        @PathVariable id: Long,
+        @RequestParam(value = "expanded", required = false) expanded: Boolean = false,
+        @RequestParam(value = "user_id", required = false) userId: Long?,
+    ): ResponseEntity<Any> = prepareMusic(musicService.findById(id).get(), expanded, userId)
 
 
     @GetMapping
     fun getMusics(): Set<ContentSimple> = musicService.findAllIdName()
 
-    fun prepareMusic(music: Music): Content {
+    fun prepareMusic(music: Music, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
         var rating = musicService.getRating(music.id)
 
@@ -145,29 +182,77 @@ class MusicController(
         }
 
         val poster = music.albums.firstOrNull()?.let { musicAlbumService.findById(it.musicAlbumId).get().poster }
+        if (!expanded) {
+            return ResponseEntity(Content(music.id, music.name, music.year, poster, rating, genres), HttpStatus.OK)
+        } else {
+            if (userId == null) return ResponseEntity(HttpStatus.BAD_REQUEST)
 
-        return Content(
-            music.id,
-            music.name,
-            music.year,
-            poster,
-            rating,
-            genres,
-        )
+            val albums = mutableSetOf<MusicAlbum>()
+
+            music.albums.forEach {
+                albums.add(musicAlbumService.findById(it.musicAlbumId).get())
+            }
+
+            val artists = mutableSetOf<Artist>()
+
+            music.artists.forEach {
+                artists.add(artistService.findById(it.artistId).get())
+            }
+
+            val viewed = userService.existsViewByUserIdMusicId(userId, music.id)
+
+            val userRating = userService.getUserMusicRating(userId, music.id)
+
+            val top = musicTopService.findByMusicId(music.id).firstOrNull()
+            val topIdName = top?.let { TopIdName(it.id, it.name) }
+            val topPosition = top?.let { musicTopService.findPositionInTop(it.id, music.id) }
+
+            return ResponseEntity(
+                MusicForAnswer(
+                    music.id,
+                    music.name,
+                    music.year,
+                    music.duration,
+                    poster,
+                    rating,
+                    artists,
+                    albums,
+                    genres,
+                    viewed,
+                    userRating,
+                    topIdName,
+                    topPosition
+                ), HttpStatus.OK
+            )
+        }
     }
 }
 
 @RestController
 @RequestMapping("/api/film")
-class FilmController(val filmService: FilmService, val filmGenreService: FilmGenreService) {
+class FilmController(
+    val filmService: FilmService,
+    val filmGenreService: FilmGenreService,
+    val userService: UserService,
+    val filmTopService: FilmTopService,
+    val filmSeriesService: FilmSeriesService,
+    val bookService: BookService,
+    val musicService: MusicService,
+    val peopleService: PeopleService,
+    val peopleFunctionService: PeopleFunctionService
+) {
 
     @GetMapping("/{id}")
-    fun getFilm(@PathVariable id: Long): Content = prepareFilm(filmService.findById(id).get())
+    fun getFilm(
+        @PathVariable id: Long,
+        @RequestParam(value = "expanded", required = false) expanded: Boolean = false,
+        @RequestParam(value = "user_id", required = false) userId: Long?,
+    ): ResponseEntity<Any> = prepareFilm(filmService.findById(id).get(), expanded, userId)
 
     @GetMapping
     fun getFilms(): Set<ContentSimple> = filmService.findAllIdName()
 
-    fun prepareFilm(film: Film): Content {
+    fun prepareFilm(film: Film, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
         var rating = filmService.getRating(film.id)
 
@@ -178,32 +263,121 @@ class FilmController(val filmService: FilmService, val filmGenreService: FilmGen
         film.filmGenres.forEach {
             genres.add(filmGenreService.getFilmGenre(it.filmGenreId).get().name)
         }
+        if (!expanded) {
+            return ResponseEntity(
+                Content(
+                    film.id,
+                    film.name,
+                    film.year,
+                    film.poster,
+                    rating,
+                    genres
+                ), HttpStatus.OK
+            )
+        } else {
+            if (userId == null) return ResponseEntity(HttpStatus.BAD_REQUEST)
 
-        return Content(
-            film.id,
-            film.name,
-            film.year,
-            film.poster,
-            rating,
-            genres,
-        )
+            val filmSeries = if (film.filmSeriesId != null) {
+                val filmSeries = filmSeriesService.findById(film.filmSeriesId).get()
+
+                FilmSeriesIdName(filmSeries.id, filmSeries.name)
+            } else null
+
+            val book = film.book?.let {
+                val bookTemp = bookService.findById(it.id).get()
+                BookIdName(bookTemp.id, bookTemp.name)
+            }
+
+            val musics = mutableSetOf<MusicIdName>()
+
+            film.musics.forEach {
+                val tempMusic = musicService.findById(it.musicId).get()
+                musics.add(MusicIdName(tempMusic.id, tempMusic.name))
+            }
+
+            val peoples = mutableSetOf<PeopleWithFunction>()
+
+            film.peoples.forEach {
+                val people = peopleService.findById(it.peopleId).get()
+                val peopleFunction = peopleFunctionService.findById(it.peopleFunctionId).get()
+                peoples.add(PeopleWithFunction(people.id, people.fullname, people.yearOfBirth, peopleFunction.name))
+
+            }
+
+            val viewed = userService.existsViewByUserIdFilmId(userId, film.id)
+
+            val userRating = userService.getUserFilmRating(userId, film.id)
+
+            val top = filmTopService.findByFilmId(film.id).firstOrNull()
+            val topIdName = top?.let { TopIdName(it.id, it.name) }
+            val topPosition = top?.let { filmTopService.findPositionInTop(it.id, film.id) }
+
+
+            return ResponseEntity(
+                FilmForAnswer(
+                    film.id,
+                    film.name,
+                    film.year,
+                    film.duration,
+                    film.description,
+                    film.poster,
+                    rating,
+                    filmSeries,
+                    book,
+                    musics,
+                    peoples,
+                    genres,
+                    viewed,
+                    userRating,
+                    topIdName,
+                    topPosition
+                ), HttpStatus.OK
+            )
+
+        }
     }
 }
 
 
 @RestController
 @RequestMapping("/api/top")
-class TopController(val bookTopService: BookTopService) {
+class TopController(
+    val bookTopService: BookTopService,
+    val musicTopService: MusicTopService,
+    val filmTopService: FilmTopService
+) {
 
     @GetMapping("/book")
-    fun getBookTops(): MutableIterable<BookTop> {
-        return bookTopService.findAll()
+    fun getBookTops(): Set<TopIdName> {
+        return bookTopService.findAllIdName()
 
     }
 
     @GetMapping("/book/{id}")
     fun getBookTop(@PathVariable id: Long): Optional<BookTop> {
         return bookTopService.findById(id)
+    }
+
+    @GetMapping("/music")
+    fun getMusicTops(): Set<TopIdName> {
+        return musicTopService.findAllIdName()
+
+    }
+
+    @GetMapping("/music/{id}")
+    fun getMusicTop(@PathVariable id: Long): Optional<MusicTop> {
+        return musicTopService.findById(id)
+    }
+
+    @GetMapping("/film")
+    fun getFilmTops(): Set<TopIdName> {
+        return filmTopService.findAllIdName()
+
+    }
+
+    @GetMapping("/film/{id}")
+    fun getFilmTop(@PathVariable id: Long): Optional<FilmTop> {
+        return filmTopService.findById(id)
     }
 
 }

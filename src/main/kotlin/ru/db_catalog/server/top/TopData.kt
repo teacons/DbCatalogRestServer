@@ -13,30 +13,25 @@ data class BookTop(
 
 @Table("top_has_book")
 data class BookTopRef(val bookId: Long, val position: Int)
-//@Table("top")
-//data class FilmTop(
-//    @Id val id: Long, val name: String,
-//    @MappedCollection(idColumn = "top_id")
-//    val films: MutableSet<FilmTopRef> = mutableSetOf(),
-//) {
-//    fun addFilm(film: Film) {
-//        films.add(FilmTopRef(film.id))
-//    }
-//}
 
-//@Table("top")
-//data class MusicTop(
-//    @Id val id: Long, val name: String,
-//    @MappedCollection(idColumn = "top_id")
-//    val musics: MutableSet<MusicTopRef> = mutableSetOf(),
-//) {
-//    fun addFilm(music: Music) {
-//        musics.add(MusicTopRef(music.id))
-//    }
-//}
+data class TopIdName(val id: Long, val name: String)
 
-//@Table("top_has_film")
-//data class FilmTopRef(val filmId: Long, val position: Int) TODO
+@Table("top")
+data class FilmTop(
+    @Id val id: Long, val name: String,
+    @MappedCollection(idColumn = "top_id")
+    val films: MutableSet<FilmTopRef> = mutableSetOf(),
+)
 
-//@Table("top_has_music")
-//data class MusicTopRef(val musicId: Long, val position: Int) TODO
+@Table("top_has_film")
+data class FilmTopRef(val filmId: Long, val position: Int)
+
+@Table("top")
+data class MusicTop(
+    @Id val id: Long, val name: String,
+    @MappedCollection(idColumn = "top_id")
+    val musics: MutableSet<MusicTopRef> = mutableSetOf(),
+)
+
+@Table("top_has_music")
+data class MusicTopRef(val musicId: Long, val position: Int)
