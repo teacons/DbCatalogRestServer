@@ -33,3 +33,6 @@ interface UserRepository : CrudRepository<User, Long> {
     fun getUserFilmRating(@Param("userId") userId: Long, @Param("filmId") filmId: Long): Double?
 
 }
+
+@Repository
+interface UserRoleRepository : CrudRepository<RoleEntity, Long>

@@ -3,21 +3,17 @@ package ru.db_catalog.server.user
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
-import ru.db_catalog.server.film.FilmGenre
-import ru.db_catalog.server.book.Book
-import ru.db_catalog.server.book.BookGenre
-import ru.db_catalog.server.film.Film
-import ru.db_catalog.server.music.Music
-import ru.db_catalog.server.music.MusicGenre
 import java.sql.Timestamp
 
 @Table("user")
 data class User(
     @Id val id: Long?,
-    val username: String,
-    val password: String,
-    val email: String,
+    var username: String,
+    var password: String,
+    var email: String,
     val createTime: Timestamp,
+    @MappedCollection(idColumn = "id")
+    val role: Long,
 
     @MappedCollection(idColumn = "user_id")
     val likedBookGenres: MutableSet<UserBookGenreRef> = mutableSetOf(),
@@ -32,9 +28,13 @@ data class User(
     val viewedFilm: MutableSet<UserViewedFilmRef> = mutableSetOf(),
     @MappedCollection(idColumn = "user_id")
     val viewedMusic: MutableSet<UserViewedMusicRef> = mutableSetOf(),
-) {
+)
 
-}
+data class UserForAnswer(
+    val username: String,
+    val email: String,
+    val createTime: Timestamp
+)
 
 @Table("user_likes_book_genre")
 data class UserBookGenreRef(val bookGenreId: Long)
@@ -46,12 +46,15 @@ data class UserFilmGenreRef(val filmGenreId: Long)
 data class UserMusicGenreRef(val musicGenreId: Long)
 
 @Table("user_viewed_book")
-data class UserViewedBookRef(val bookId: Long)
+data class UserViewedBookRef(val bookId: Long, var rating: Int?, val time: Timestamp)
 
 @Table("user_viewed_film")
-data class UserViewedFilmRef(val filmId: Long)
+data class UserViewedFilmRef(val filmId: Long, var rating: Int?, val time: Timestamp)
 
 @Table("user_viewed_music")
-data class UserViewedMusicRef(val musicId: Long)
+data class UserViewedMusicRef(val musicId: Long, var rating: Int?, val time: Timestamp)
 
-data class UserRegisterAnswer(val code: Long, val userId: Long?)
+data class UserRegisterAnswerAndChange(val code: Long)
+
+@Table("user_role")
+data class RoleEntity(@Id val id: Long, val name: String)

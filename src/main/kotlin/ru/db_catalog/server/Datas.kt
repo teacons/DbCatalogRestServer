@@ -22,3 +22,5 @@ data class Content(
 )
 
 data class ContentIdName(val id: Long, val name: String)
+
+data class AuthResponse(val token: String?)

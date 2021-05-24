@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.db_catalog.server.Content
 import ru.db_catalog.server.ContentIdName
+import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.top.MusicTopService
 import ru.db_catalog.server.top.TopIdName
 import ru.db_catalog.server.user.UserService
@@ -17,16 +18,20 @@ class MusicController(
     val musicAlbumService: MusicAlbumService,
     val artistService: ArtistService,
     val userService: UserService,
-    val musicTopService: MusicTopService
-
+    val musicTopService: MusicTopService,
+    val jwtProvider: JwtProvider
 ) {
 
     @GetMapping("/{id}")
     fun getMusic(
         @PathVariable id: Long,
         @RequestParam(value = "expanded", required = false) expanded: Boolean = false,
-        @RequestParam(value = "user_id", required = false) userId: Long?,
-    ): ResponseEntity<Any> = prepareMusic(musicService.findById(id).get(), expanded, userId)
+        @RequestHeader("Authorization") token: String
+    ): ResponseEntity<Any> {
+        val username = jwtProvider.getLoginFromToken(token.substring(7))
+        val userId = userService.findByUsername(username)?.id
+        return prepareMusic(musicService.findById(id).get(), expanded, userId)
+    }
 
 
     @GetMapping

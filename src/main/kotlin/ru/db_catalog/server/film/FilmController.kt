@@ -23,15 +23,20 @@ class FilmController(
     val bookService: BookService,
     val musicService: MusicService,
     val peopleService: PeopleService,
-    val peopleFunctionService: PeopleFunctionService
+    val peopleFunctionService: PeopleFunctionService,
+    val jwtProvider: JwtProvider
 ) {
 
     @GetMapping("/{id}")
     fun getFilm(
         @PathVariable id: Long,
         @RequestParam(value = "expanded", required = false) expanded: Boolean = false,
-        @RequestParam(value = "user_id", required = false) userId: Long?,
-    ): ResponseEntity<Any> = prepareFilm(filmService.findById(id).get(), expanded, userId)
+        @RequestHeader("Authorization") token: String
+    ): ResponseEntity<Any> {
+        val username = jwtProvider.getLoginFromToken(token.substring(7))
+        val userId = userService.findByUsername(username)?.id
+        return prepareFilm(filmService.findById(id).get(), expanded, userId)
+    }
 
     @GetMapping
     fun getFilms(): Set<ContentIdName> = filmService.findAllIdName()

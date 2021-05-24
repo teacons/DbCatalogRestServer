@@ -11,6 +11,8 @@ class FilmGenreService(val db: FilmGenreRepository) {
 
     fun getFilmGenre(id: Long): Optional<FilmGenre> = db.findById(id)
 
+    fun existsById(id: Long) = db.existsById(id)
+
 }
 
 @Service

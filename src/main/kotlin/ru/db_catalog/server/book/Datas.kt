@@ -27,7 +27,7 @@ data class Book(
 data class BookSeries(
     @Id val id: Long, val name: String, val description: String?,
     @MappedCollection(idColumn = "book_series_id", keyColumn = "book_series_id")
-    val books: List<Book>
+    val books: Set<Book>
 )
 
 @Table("book_has_book_genre")

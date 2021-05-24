@@ -11,6 +11,8 @@ class MusicGenreService(val db: MusicGenreRepository) {
 
     fun getMusicGenre(id: Long): Optional<MusicGenre> = db.findById(id)
 
+    fun existsById(id: Long) = db.existsById(id)
+
 }
 
 @Service

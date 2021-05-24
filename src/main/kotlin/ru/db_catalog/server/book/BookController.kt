@@ -3,14 +3,10 @@ package ru.db_catalog.server.book
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import ru.db_catalog.server.Content
-import ru.db_catalog.server.ContentIdName
-import ru.db_catalog.server.People
-import ru.db_catalog.server.PeopleService
+import ru.db_catalog.server.*
 import ru.db_catalog.server.top.BookTopService
 import ru.db_catalog.server.top.TopIdName
 import ru.db_catalog.server.user.UserService
-import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/api/book")
@@ -20,16 +16,18 @@ class BookController(
     val peopleService: PeopleService,
     val bookSeriesService: BookSeriesService,
     val bookTopService: BookTopService,
-    val userService: UserService
+    val userService: UserService,
+    val jwtProvider: JwtProvider
 ) {
 
     @GetMapping("/{id}")
     fun getBook(
         @PathVariable id: Long,
         @RequestParam(value = "expanded", required = false) expanded: Boolean = false,
-        @RequestParam(value = "user_id", required = false) userId: Long?,
-        response: HttpServletResponse
+        @RequestHeader("Authorization") token: String
     ): ResponseEntity<Any> {
+        val username = jwtProvider.getLoginFromToken(token.substring(7))
+        val userId = userService.findByUsername(username)?.id
         return prepareBook(bookService.findById(id).get(), expanded, userId)
     }
 

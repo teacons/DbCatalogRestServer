@@ -11,6 +11,8 @@ class BookGenreService(val db: BookGenreRepository) {
 
     fun getBookGenre(id: Long): Optional<BookGenre> = db.findById(id)
 
+    fun existsById(id: Long) = db.existsById(id)
+
 }
 
 @Service
