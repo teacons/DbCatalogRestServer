@@ -19,7 +19,19 @@ interface BookRepository : CrudRepository<Book, Long> {
     fun findAllIdName(): Set<ContentIdName>
 
     @Query("select id, name from book where id in (:ids)")
-    fun getNames(ids: Set<Long>): Set<ContentIdName>
+    fun findIdNameByIds(@Param("ids") ids: Set<Long>): Set<ContentIdName>
+
+    @Query("select id from book where year between :year and :year2")
+    fun findAllByYearBetween(year: Int, year2: Int): Set<Long>
+
+    @Query("with tmp as (select book_id, round(avg(rating), 2) as rating from user_viewed_book where rating >= :down and rating <= :up group by book_id) select book_id from tmp")
+    fun findAllByRatings(@Param("down") down: Int, @Param("up") up: Int): Set<Long>
+
+    @Query("select distinct id from book join book_has_people on book.id = book_has_people.book_id where people_id in (:authors)")
+    fun findAllByAuthors(@Param("authors") authors: Set<Long>): Set<Long>
+
+    @Query("select distinct id from book join book_has_book_genre on book.id = book_has_book_genre.book_id where book_has_book_genre.book_genre_id in (:genres)")
+    fun findAllByGenres(@Param("genres") genres: Set<Long>): Set<Long>
 
 }
 

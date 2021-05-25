@@ -53,9 +53,9 @@ class UserService(
 
     fun getUserFilmRating(userId: Long, filmId: Long) = userRepository.getUserFilmRating(userId, filmId)
 
-    fun getBookNamesByIds(ids: Set<Long>) = bookRepository.getNames(ids)
+    fun getBookNamesByIds(ids: Set<Long>) = bookRepository.findIdNameByIds(ids)
 
-    fun getFilmNamesByIds(ids: Set<Long>) = filmRepository.getNames(ids)
+    fun getFilmNamesByIds(ids: Set<Long>) = filmRepository.findIdNameByIds(ids)
 
     fun getMusicNamesByIds(ids: Set<Long>) = musicRepository.getNames(ids)
 

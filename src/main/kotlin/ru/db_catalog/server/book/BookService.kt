@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service
 import ru.db_catalog.server.ContentIdName
 import java.util.*
 
-
 @Service
 class BookService(
     val bookRepository: BookRepository,
@@ -17,7 +16,18 @@ class BookService(
 
     fun findAllBookIdName(): Set<ContentIdName> = bookRepository.findAllIdName()
 
+    fun findBookIdNameByIds(ids: Set<Long>): Set<ContentIdName> = bookRepository.findIdNameByIds(ids)
+
     fun getBookRating(id: Long): Double? = bookRepository.getRating(id)
+
+    fun getBooksBetweenYears(years: Pair<Int, Int>) =
+        bookRepository.findAllByYearBetween(years.first, years.second)
+
+    fun findAllByRatings(ratings: Pair<Int, Int>) = bookRepository.findAllByRatings(ratings.first, ratings.second)
+
+    fun findAllByAuthors(authors: Set<Long>) = bookRepository.findAllByAuthors(authors)
+
+    fun findAllByGenres(genres: Set<Long>) = bookRepository.findAllByGenres(genres)
 
     fun findAllBookPeoples(): MutableIterable<BookAuthorRef> = bookPeopleRepository.findAll()
 

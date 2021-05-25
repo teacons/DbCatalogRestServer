@@ -16,7 +16,20 @@ class FilmService(
 
     fun findAllFilmsIdName(): Set<ContentIdName> = filmRepository.findAllIdName()
 
+    fun findFilmIdNameByIds(ids: Set<Long>): Set<ContentIdName> = filmRepository.findIdNameByIds(ids)
+
     fun getFilmRating(id: Long): Double? = filmRepository.getRating(id)
+
+    fun getBooksBetweenYears(years: Pair<Int, Int>) =
+        filmRepository.findAllByYearBetween(years.first, years.second)
+
+    fun findAllByRatings(ratings: Pair<Int, Int>) = filmRepository.findAllByRatings(ratings.first, ratings.second)
+
+    fun findAllByAuthors(authors: Set<Long>) = filmRepository.findAllByAuthors(authors)
+
+    fun findAllByGenres(genres: Set<Long>) = filmRepository.findAllByGenres(genres)
+
+    fun findAllByDuration(duration: Int, duration2: Int) = filmRepository.findAllByDuration(duration, duration2)
 
     fun findAllFilmPeople(): MutableIterable<FilmPeopleRef> = filmPeopleRepository.findAll()
 
