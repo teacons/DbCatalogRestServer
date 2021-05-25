@@ -5,7 +5,6 @@ import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import ru.db_catalog.server.ContentIdName
 import ru.db_catalog.server.people.People
-import ru.db_catalog.server.top.TopIdName
 
 @Table("book_genre")
 data class BookGenre(@Id val id: Long, val name: String, val description: String)
@@ -49,6 +48,6 @@ data class BookForAnswer(
     val genres: Set<String>,
     val viewed: Boolean,
     val ratingUser: Double?,
-    val top: TopIdName?,
+    val top: ContentIdName?,
     val topPosition: Int?
 )

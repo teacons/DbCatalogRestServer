@@ -4,6 +4,7 @@ import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import ru.db_catalog.server.ContentIdName
 
 @Repository
 interface BookTopRepository : CrudRepository<BookTop, Long> {
@@ -15,7 +16,7 @@ interface BookTopRepository : CrudRepository<BookTop, Long> {
     fun findPositionInTop(@Param("top_id") topId: Long, @Param("book_id") bookId: Long): Int
 
     @Query("select id, name from top where id in (select top_id from top_has_book)")
-    fun findAllIdName(): Set<TopIdName>
+    fun findAllIdName(): Set<ContentIdName>
 }
 
 @Repository
@@ -28,7 +29,7 @@ interface FilmTopRepository : CrudRepository<FilmTop, Long> {
     fun findPositionInTop(@Param("top_id") topId: Long, @Param("film_id") filmId: Long): Int
 
     @Query("select id, name from top where id in (select top_id from top_has_film)")
-    fun findAllIdName(): Set<TopIdName>
+    fun findAllIdName(): Set<ContentIdName>
 
 }
 
@@ -42,6 +43,6 @@ interface MusicTopRepository : CrudRepository<MusicTop, Long> {
     fun findPositionInTop(@Param("top_id") topId: Long, @Param("music_id") musicId: Long): Int
 
     @Query("select id, name from top where id in (select top_id from top_has_music)")
-    fun findAllIdName(): Set<TopIdName>
+    fun findAllIdName(): Set<ContentIdName>
 
 }

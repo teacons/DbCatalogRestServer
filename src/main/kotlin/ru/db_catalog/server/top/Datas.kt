@@ -34,6 +34,3 @@ data class MusicTop(
 
 @Table("top_has_music")
 data class MusicTopRef(@Column("music_id") val id: Long, val position: Int)
-
-data class TopIdName(val id: Long, val name: String)
-

@@ -9,7 +9,6 @@ import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.people.People
 import ru.db_catalog.server.people.PeopleService
 import ru.db_catalog.server.top.BookTopService
-import ru.db_catalog.server.top.TopIdName
 import ru.db_catalog.server.user.UserService
 
 @RestController
@@ -69,7 +68,7 @@ class BookController(
             val userRating = userService.getUserBookRating(userId, book.id)
 
             val top = bookTopService.findByBookId(book.id).firstOrNull()
-            val topIdName = top?.let { TopIdName(it.id, it.name) }
+            val topIdName = top?.let { ContentIdName(it.id, it.name) }
             val topPosition = top?.let { bookTopService.findPositionInTop(it.id, book.id) }
 
             return ResponseEntity(

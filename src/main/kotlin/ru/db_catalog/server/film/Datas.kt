@@ -6,7 +6,6 @@ import org.springframework.data.relational.core.mapping.Table
 import ru.db_catalog.server.ContentIdName
 import ru.db_catalog.server.book.Book
 import ru.db_catalog.server.people.PeopleWithFunction
-import ru.db_catalog.server.top.TopIdName
 
 @Table("film")
 data class Film(
@@ -58,7 +57,7 @@ data class FilmForAnswer(
     val genres: Set<String>,
     val viewed: Boolean,
     val ratingUser: Double?,
-    val top: TopIdName?,
+    val top: ContentIdName?,
     val topPosition: Int?
 )
 

@@ -11,7 +11,6 @@ import ru.db_catalog.server.music.MusicService
 import ru.db_catalog.server.people.PeopleService
 import ru.db_catalog.server.people.PeopleWithFunction
 import ru.db_catalog.server.top.FilmTopService
-import ru.db_catalog.server.top.TopIdName
 import ru.db_catalog.server.user.UserService
 
 @RestController
@@ -98,7 +97,7 @@ class FilmController(
             val userRating = userService.getUserFilmRating(userId, film.id)
 
             val top = filmTopService.findByFilmId(film.id).firstOrNull()
-            val topIdName = top?.let { TopIdName(it.id, it.name) }
+            val topIdName = top?.let { ContentIdName(it.id, it.name) }
             val topPosition = top?.let { filmTopService.findPositionInTop(it.id, film.id) }
 
 

@@ -3,7 +3,7 @@ package ru.db_catalog.server.music
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
-import ru.db_catalog.server.top.TopIdName
+import ru.db_catalog.server.ContentIdName
 
 @Table("music")
 data class Music(
@@ -54,6 +54,6 @@ data class MusicForAnswer(
     val genres: Set<String>,
     val viewed: Boolean,
     val ratingUser: Double?,
-    val top: TopIdName?,
+    val top: ContentIdName?,
     val topPosition: Int?
 )

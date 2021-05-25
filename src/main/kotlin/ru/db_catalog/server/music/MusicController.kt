@@ -7,7 +7,6 @@ import ru.db_catalog.server.Content
 import ru.db_catalog.server.ContentIdName
 import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.top.MusicTopService
-import ru.db_catalog.server.top.TopIdName
 import ru.db_catalog.server.user.UserService
 
 @RestController
@@ -69,7 +68,7 @@ class MusicController(
             val userRating = userService.getUserMusicRating(userId, music.id)
 
             val top = musicTopService.findByMusicId(music.id).firstOrNull()
-            val topIdName = top?.let { TopIdName(it.id, it.name) }
+            val topIdName = top?.let { ContentIdName(it.id, it.name) }
             val topPosition = top?.let { musicTopService.findPositionInTop(it.id, music.id) }
 
             return ResponseEntity(

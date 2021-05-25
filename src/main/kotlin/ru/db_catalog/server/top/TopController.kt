@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import ru.db_catalog.server.ContentIdName
 import java.util.*
 
 @RestController
@@ -15,7 +16,7 @@ class TopController(
 ) {
 
     @GetMapping("/book")
-    fun getBookTops(): Set<TopIdName> {
+    fun getBookTops(): Set<ContentIdName> {
         return bookTopService.findAllIdName()
 
     }
@@ -26,7 +27,7 @@ class TopController(
     }
 
     @GetMapping("/music")
-    fun getMusicTops(): Set<TopIdName> {
+    fun getMusicTops(): Set<ContentIdName> {
         return musicTopService.findAllIdName()
 
     }
@@ -37,7 +38,7 @@ class TopController(
     }
 
     @GetMapping("/film")
-    fun getFilmTops(): Set<TopIdName> {
+    fun getFilmTops(): Set<ContentIdName> {
         return filmTopService.findAllIdName()
 
     }
