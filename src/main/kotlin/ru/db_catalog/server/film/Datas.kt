@@ -52,7 +52,7 @@ data class FilmForAnswer(
     val description: String,
     val poster: String?,
     val rating: Double,
-    val filmSeries: FilmSeriesIdName?,
+    val filmSeries: ContentIdName?,
     val book: ContentIdName?,
     val music: Set<MusicIdName>,
     val peoples: Set<PeopleWithFunction>,
@@ -62,8 +62,6 @@ data class FilmForAnswer(
     val top: TopIdName?,
     val topPosition: Int?
 )
-
-data class FilmSeriesIdName(val id: Long, val name: String)
 
 @Table("film_genre")
 data class FilmGenre(@Id val id: Long, val name: String, val description: String)

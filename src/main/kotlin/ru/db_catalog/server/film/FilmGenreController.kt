@@ -8,12 +8,12 @@ import java.util.*
 
 @RestController
 @RequestMapping("/api/film_genre")
-class FilmGenreController(val service: FilmGenreService) {
+class FilmGenreController(val service: FilmService) {
 
     @GetMapping
-    fun getFilmGenres(): MutableIterable<FilmGenre> = service.getFilmGenres()
+    fun getFilmGenres(): MutableIterable<FilmGenre> = service.findAllFilmGenres()
 
     @GetMapping("/{id}")
-    fun getFilmGenre(@PathVariable id: Long): Optional<FilmGenre> = service.getFilmGenre(id)
+    fun getFilmGenre(@PathVariable id: Long): Optional<FilmGenre> = service.findFilmGenreById(id)
 
 }

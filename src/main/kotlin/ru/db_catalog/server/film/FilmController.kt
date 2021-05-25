@@ -18,10 +18,10 @@ import ru.db_catalog.server.user.UserService
 @RequestMapping("/api/film")
 class FilmController(
     val filmService: FilmService,
-    val filmGenreService: FilmGenreService,
+    val filmGenreService: FilmService,
     val userService: UserService,
     val filmTopService: FilmTopService,
-    val filmSeriesService: FilmSeriesService,
+    val filmSeriesService: FilmService,
     val bookService: BookService,
     val musicService: MusicService,
     val peopleService: PeopleService,
@@ -37,22 +37,22 @@ class FilmController(
     ): ResponseEntity<Any> {
         val username = jwtProvider.getLoginFromToken(token.substring(7))
         val userId = userService.findByUsername(username)?.id
-        return prepareFilm(filmService.findById(id).get(), expanded, userId)
+        return prepareFilm(filmService.findFilmById(id).get(), expanded, userId)
     }
 
     @GetMapping
-    fun getFilms(): Set<ContentIdName> = filmService.findAllIdName()
+    fun getFilms(): Set<ContentIdName> = filmService.findAllFilmsIdName()
 
     fun prepareFilm(film: Film, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
-        var rating = filmService.getRating(film.id)
+        var rating = filmService.getFilmRating(film.id)
 
         if (rating == null) rating = 0.0
 
         val genres = mutableSetOf<String>()
 
         film.filmGenres.forEach {
-            genres.add(filmGenreService.getFilmGenre(it.filmGenreId).get().name)
+            genres.add(filmGenreService.findFilmGenreById(it.filmGenreId).get().name)
         }
         if (!expanded) {
             return ResponseEntity(
@@ -69,9 +69,9 @@ class FilmController(
             if (userId == null) return ResponseEntity(HttpStatus.BAD_REQUEST)
 
             val filmSeries = if (film.filmSeriesId != null) {
-                val filmSeries = filmSeriesService.findById(film.filmSeriesId).get()
+                val filmSeries = filmSeriesService.findFilmSeriesById(film.filmSeriesId).get()
 
-                FilmSeriesIdName(filmSeries.id, filmSeries.name)
+                ContentIdName(filmSeries.id, filmSeries.name)
             } else null
 
             val book = film.book?.let {

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*
 import ru.db_catalog.server.AuthResponse
 import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.book.BookService
-import ru.db_catalog.server.film.FilmGenreService
+import ru.db_catalog.server.film.FilmService
 import ru.db_catalog.server.music.MusicGenreService
 import java.sql.Timestamp
 import java.util.*
@@ -18,7 +18,7 @@ class UserController(
     val userService: UserService,
     val jwtProvider: JwtProvider,
     val bookGenreService: BookService,
-    val filmGenreService: FilmGenreService,
+    val filmGenreService: FilmService,
     val musicGenreService: MusicGenreService
 ) {
 
@@ -247,7 +247,7 @@ class UserController(
         user.likedFilmGenres.clear()
 
         genres.forEach {
-            if (filmGenreService.existsById(it)) user.likedFilmGenres.add(UserFilmGenreRef(it))
+            if (filmGenreService.existsFilmGenreById(it)) user.likedFilmGenres.add(UserFilmGenreRef(it))
         }
 
         userService.save(user)

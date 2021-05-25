@@ -52,7 +52,7 @@ class PeopleController(
         val username = jwtProvider.getLoginFromToken(token.substring(7))
         userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
 
-        val peopleIds = filmService.findAll()
+        val peopleIds = filmService.findAllFilmPeople()
 
         val peoples = mutableSetOf<PeopleWithFunction>()
 
