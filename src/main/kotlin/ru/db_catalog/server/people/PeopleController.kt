@@ -34,12 +34,12 @@ class PeopleController(
         val username = jwtProvider.getLoginFromToken(token.substring(7))
         userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
 
-        val peopleIds = bookService.findAllBookPeople()
+        val peopleIds = bookService.findAllBookPeoples()
 
         val peoples = mutableSetOf<People>()
 
         peopleIds.forEach{
-            peoples.add(peopleService.findById(it).get())
+            peoples.add(peopleService.findById(it.peopleId).get())
         }
 
         return ResponseEntity(peoples, HttpStatus.OK)

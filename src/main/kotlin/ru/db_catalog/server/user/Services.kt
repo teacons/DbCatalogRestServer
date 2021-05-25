@@ -3,7 +3,6 @@ package ru.db_catalog.server.user
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import ru.db_catalog.server.book.BookRepository
-import ru.db_catalog.server.book.BookService
 import ru.db_catalog.server.film.FilmRepository
 import ru.db_catalog.server.music.MusicRepository
 

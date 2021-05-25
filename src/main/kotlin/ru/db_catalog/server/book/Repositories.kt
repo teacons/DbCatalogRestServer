@@ -27,9 +27,4 @@ interface BookRepository : CrudRepository<Book, Long> {
 interface BookSeriesRepository : CrudRepository<BookSeries, Long>
 
 @Repository
-interface BookPeopleRepository : CrudRepository<BookAuthorRef, Long> {
-
-    @Query("select distinct people_id from book_has_people")
-    fun findAllBookPeople(): Set<Long>
-
-}
+interface BookPeopleRepository : CrudRepository<BookAuthorRef, Long>

@@ -3,7 +3,9 @@ package ru.db_catalog.server.book
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import ru.db_catalog.server.*
+import ru.db_catalog.server.Content
+import ru.db_catalog.server.ContentIdName
+import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.people.People
 import ru.db_catalog.server.people.PeopleService
 import ru.db_catalog.server.top.BookTopService
@@ -14,9 +16,7 @@ import ru.db_catalog.server.user.UserService
 @RequestMapping("/api/book")
 class BookController(
     val bookService: BookService,
-    val bookGenreService: BookGenreService,
     val peopleService: PeopleService,
-    val bookSeriesService: BookSeriesService,
     val bookTopService: BookTopService,
     val userService: UserService,
     val jwtProvider: JwtProvider
@@ -30,22 +30,22 @@ class BookController(
     ): ResponseEntity<Any> {
         val username = jwtProvider.getLoginFromToken(token.substring(7))
         val userId = userService.findByUsername(username)?.id
-        return prepareBook(bookService.findById(id).get(), expanded, userId)
+        return prepareBook(bookService.findBookById(id).get(), expanded, userId)
     }
 
     @GetMapping
-    fun getBooks(): Set<ContentIdName> = bookService.findAllIdName()
+    fun getBooks(): Set<ContentIdName> = bookService.findAllBookIdName()
 
     fun prepareBook(book: Book, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
-        var rating = bookService.getRating(book.id)
+        var rating = bookService.getBookRating(book.id)
 
         if (rating == null) rating = 0.0
 
         val genres = mutableSetOf<String>()
 
         book.bookGenres.forEach {
-            genres.add(bookGenreService.getBookGenre(it.bookGenreId).get().name)
+            genres.add(bookService.findBookGenreById(it.bookGenreId).get().name)
         }
 
         if (!expanded) {
@@ -53,9 +53,9 @@ class BookController(
         } else {
             if (userId == null) return ResponseEntity(HttpStatus.BAD_REQUEST)
             val bookSeriesWithoutBooks = if (book.bookSeriesId != null) {
-                val bookSeries = bookSeriesService.findById(book.bookSeriesId).get()
+                val bookSeries = bookService.findBookSeriesById(book.bookSeriesId).get()
 
-                BookSeriesIdName(bookSeries.id, bookSeries.name)
+                ContentIdName(bookSeries.id, bookSeries.name)
             } else null
 
             val authors = mutableSetOf<People>()
