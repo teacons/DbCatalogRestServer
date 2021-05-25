@@ -5,7 +5,6 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import ru.db_catalog.server.ContentIdName
-import ru.db_catalog.server.book.BookAuthorRef
 
 @Repository
 interface FilmGenreRepository : CrudRepository<FilmGenre, Long>

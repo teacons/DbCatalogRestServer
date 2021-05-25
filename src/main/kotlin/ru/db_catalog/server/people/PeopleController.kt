@@ -3,13 +3,11 @@ package ru.db_catalog.server.people
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.book.BookService
 import ru.db_catalog.server.film.FilmService
-import ru.db_catalog.server.music.Artist
 import ru.db_catalog.server.music.MusicService
 import ru.db_catalog.server.user.UserService
 
@@ -21,74 +19,51 @@ class PeopleController(
     val bookService: BookService,
     val peopleService: PeopleService,
     val filmService: FilmService,
-    val peopleFunctionService: PeopleFunctionService,
     val musicService: MusicService,
     val musicArtistService: MusicService
 ) {
 
     @GetMapping("/book")
-    fun getBookPeoples(
-        @RequestHeader("Authorization") token: String
-    ): ResponseEntity<Any> {
-        val username = jwtProvider.getLoginFromToken(token.substring(7))
-        userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+    fun getBookPeoples(): ResponseEntity<Any> {
+        val peopleIds = bookService.findAllBookPeoples().map { it.peopleId }.toSet()
 
-        val peopleIds = bookService.findAllBookPeoples()
-
-        val peoples = mutableSetOf<People>()
-
-        peopleIds.forEach{
-            peoples.add(peopleService.findById(it.peopleId).get())
-        }
-
-        return ResponseEntity(peoples, HttpStatus.OK)
+        return ResponseEntity(peopleService.findAllPeopleByIdIn(peopleIds), HttpStatus.OK)
     }
 
     @GetMapping("/film")
-    fun getFilmPeoples(
-        @RequestHeader("Authorization") token: String
-    ): ResponseEntity<Any> {
-        val username = jwtProvider.getLoginFromToken(token.substring(7))
-        userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+    fun getFilmPeoples(): ResponseEntity<Any> {
+        val peopleIds = filmService.findAllFilmPeople().toSet()
 
-        val peopleIds = filmService.findAllFilmPeople()
+        val peoples = peopleService.findAllPeopleByIdIn(peopleIds.map { it.peopleId }.toSet())
 
-        val peoples = mutableSetOf<PeopleWithFunction>()
+        val answer = mutableSetOf<PeopleWithFunction>()
 
-        peopleIds.forEach{
-            val people = peopleService.findById(it.peopleId).get()
-            peoples.add(PeopleWithFunction(people.id, people.fullname, people.yearOfBirth, peopleFunctionService.findById(it.peopleFunctionId).get().name))
+        for (i in peoples.indices) {
+            peoples.elementAt(i).run {
+                answer.add(
+                    PeopleWithFunction(
+                        this.id,
+                        this.fullname,
+                        this.yearOfBirth,
+                        peopleService.findPeopleFunctionById(peopleIds.elementAt(i).peopleFunctionId).get().name
+                    )
+                )
+            }
         }
 
-        return ResponseEntity(peoples, HttpStatus.OK)
+        return ResponseEntity(answer, HttpStatus.OK)
     }
 
     @GetMapping("/music")
-    fun getMusicArtists(
-        @RequestHeader("Authorization") token: String
-    ): ResponseEntity<Any> {
-        val username = jwtProvider.getLoginFromToken(token.substring(7))
-        userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+    fun getMusicArtists(): ResponseEntity<Any> {
+        val peopleIds = musicService.findAllArtists().map { it.id }.toSet()
 
-        val peopleIds = musicService.findAllArtists()
-
-        val peoples = mutableSetOf<Artist>()
-
-        peopleIds.forEach{
-            peoples.add(musicArtistService.findArtistById(it.id).get())
-        }
-
-        return ResponseEntity(peoples, HttpStatus.OK)
+        return ResponseEntity(peopleService.findAllPeopleByIdIn(peopleIds), HttpStatus.OK)
     }
 
     @GetMapping("/functions")
-    fun getPeopleFunctions(
-        @RequestHeader("Authorization") token: String
-    ): ResponseEntity<Any> {
-        val username = jwtProvider.getLoginFromToken(token.substring(7))
-        userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
-
-        return ResponseEntity(peopleFunctionService.findAll(), HttpStatus.OK)
+    fun getPeopleFunctions(): ResponseEntity<Any> {
+        return ResponseEntity(peopleService.findAllPeopleFunction(), HttpStatus.OK)
     }
 
 }

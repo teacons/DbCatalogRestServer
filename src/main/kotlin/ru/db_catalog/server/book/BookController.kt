@@ -61,7 +61,7 @@ class BookController(
             val authors = mutableSetOf<People>()
 
             book.authors.forEach {
-                authors.add(peopleService.findById(it.peopleId).get())
+                authors.add(peopleService.findPeopleById(it.peopleId).get())
             }
 
             val viewed = userService.existsViewByUserIdBookId(userId, book.id)

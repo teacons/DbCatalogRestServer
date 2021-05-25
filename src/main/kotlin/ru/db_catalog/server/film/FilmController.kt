@@ -8,7 +8,6 @@ import ru.db_catalog.server.ContentIdName
 import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.book.BookService
 import ru.db_catalog.server.music.MusicService
-import ru.db_catalog.server.people.PeopleFunctionService
 import ru.db_catalog.server.people.PeopleService
 import ru.db_catalog.server.people.PeopleWithFunction
 import ru.db_catalog.server.top.FilmTopService
@@ -19,14 +18,12 @@ import ru.db_catalog.server.user.UserService
 @RequestMapping("/api/film")
 class FilmController(
     val filmService: FilmService,
-    val filmGenreService: FilmService,
     val userService: UserService,
     val filmTopService: FilmTopService,
-    val filmSeriesService: FilmService,
     val bookService: BookService,
     val musicService: MusicService,
     val peopleService: PeopleService,
-    val peopleFunctionService: PeopleFunctionService,
+    val peopleFunctionService: PeopleService,
     val jwtProvider: JwtProvider
 ) {
 
@@ -53,7 +50,7 @@ class FilmController(
         val genres = mutableSetOf<String>()
 
         film.filmGenres.forEach {
-            genres.add(filmGenreService.findFilmGenreById(it.filmGenreId).get().name)
+            genres.add(filmService.findFilmGenreById(it.filmGenreId).get().name)
         }
         if (!expanded) {
             return ResponseEntity(
@@ -70,7 +67,7 @@ class FilmController(
             if (userId == null) return ResponseEntity(HttpStatus.BAD_REQUEST)
 
             val filmSeries = if (film.filmSeriesId != null) {
-                val filmSeries = filmSeriesService.findFilmSeriesById(film.filmSeriesId).get()
+                val filmSeries = filmService.findFilmSeriesById(film.filmSeriesId).get()
 
                 ContentIdName(filmSeries.id, filmSeries.name)
             } else null
@@ -90,8 +87,8 @@ class FilmController(
             val peoples = mutableSetOf<PeopleWithFunction>()
 
             film.peoples.forEach {
-                val people = peopleService.findById(it.peopleId).get()
-                val peopleFunction = peopleFunctionService.findById(it.peopleFunctionId).get()
+                val people = peopleService.findPeopleById(it.peopleId).get()
+                val peopleFunction = peopleFunctionService.findPeopleFunctionById(it.peopleFunctionId).get()
                 peoples.add(PeopleWithFunction(people.id, people.fullname, people.yearOfBirth, peopleFunction.name))
 
             }

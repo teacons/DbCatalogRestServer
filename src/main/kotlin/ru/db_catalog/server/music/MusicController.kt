@@ -14,9 +14,6 @@ import ru.db_catalog.server.user.UserService
 @RequestMapping("/api/music")
 class MusicController(
     val musicService: MusicService,
-    val musicGenreService: MusicService,
-    val musicAlbumService: MusicService,
-    val artistService: MusicService,
     val userService: UserService,
     val musicTopService: MusicTopService,
     val jwtProvider: JwtProvider
@@ -46,10 +43,10 @@ class MusicController(
         val genres = mutableSetOf<String>()
 
         music.musicGenres.forEach {
-            genres.add(musicGenreService.findMusicGenreById(it.musicGenreId).get().name)
+            genres.add(musicService.findMusicGenreById(it.musicGenreId).get().name)
         }
 
-        val poster = music.albums.firstOrNull()?.let { musicAlbumService.findMusicAlbumById(it.musicAlbumId).get().poster }
+        val poster = music.albums.firstOrNull()?.let { this.musicService.findMusicAlbumById(it.musicAlbumId).get().poster }
         if (!expanded) {
             return ResponseEntity(Content(music.id, music.name, music.year, poster, rating, genres), HttpStatus.OK)
         } else {
@@ -58,13 +55,13 @@ class MusicController(
             val albums = mutableSetOf<MusicAlbum>()
 
             music.albums.forEach {
-                albums.add(musicAlbumService.findMusicAlbumById(it.musicAlbumId).get())
+                albums.add(this.musicService.findMusicAlbumById(it.musicAlbumId).get())
             }
 
             val artists = mutableSetOf<Artist>()
 
             music.artists.forEach {
-                artists.add(artistService.findArtistById(it.artistId).get())
+                artists.add(musicService.findArtistById(it.artistId).get())
             }
 
             val viewed = userService.existsViewByUserIdMusicId(userId, music.id)
