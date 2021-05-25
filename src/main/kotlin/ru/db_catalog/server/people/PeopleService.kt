@@ -17,4 +17,8 @@ class PeopleService(
 
     fun findAllPeopleFunction(): MutableIterable<PeopleFunction> = peopleFunctionRepository.findAll()
 
+    fun findAllByFullnameIn(fullnames: Set<String>) = peopleRepository.findAllByFullnameIn(fullnames)
+
+    fun savePeople(people: People) = peopleRepository.save(people)
+
 }

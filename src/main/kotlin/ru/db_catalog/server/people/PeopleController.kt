@@ -39,7 +39,7 @@ class PeopleController(
             peoples.elementAt(i).run {
                 answer.add(
                     PeopleWithFunction(
-                        this.id,
+                        this.id!!,
                         this.fullname,
                         this.yearOfBirth,
                         peopleService.findPeopleFunctionById(peopleIds.elementAt(i).peopleFunctionId).get().name

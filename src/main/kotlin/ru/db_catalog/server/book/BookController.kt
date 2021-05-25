@@ -37,7 +37,7 @@ class BookController(
 
     fun prepareBook(book: Book, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
-        var rating = bookService.getBookRating(book.id)
+        var rating = bookService.getBookRating(book.id!!)
 
         if (rating == null) rating = 0.0
 
@@ -54,7 +54,7 @@ class BookController(
             val bookSeriesWithoutBooks = if (book.bookSeriesId != null) {
                 val bookSeries = bookService.findBookSeriesById(book.bookSeriesId).get()
 
-                ContentIdName(bookSeries.id, bookSeries.name)
+                ContentIdName(bookSeries.id!!, bookSeries.name)
             } else null
 
             val authors = mutableSetOf<People>()

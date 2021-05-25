@@ -8,6 +8,8 @@ interface PeopleRepository : CrudRepository<People, Long> {
 
     fun findAllByIdIn(ids: Set<Long>): Set<People>
 
+    fun findAllByFullnameIn(fullname: Set<String>): Set<People>
+
 }
 
 @Repository

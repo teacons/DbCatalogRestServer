@@ -11,21 +11,21 @@ data class BookGenre(@Id val id: Long, val name: String, val description: String
 
 @Table("book")
 data class Book(
-    @Id val id: Long,
+    @Id val id: Long?,
     val name: String,
     val year: Int,
     val description: String,
     val poster: String?,
     val bookSeriesId: Long?,
     @MappedCollection(idColumn = "book_id")
-    val bookGenres: MutableSet<BookGenreRef> = mutableSetOf(),
+    val bookGenres: Set<BookGenreRef> = mutableSetOf(),
     @MappedCollection(idColumn = "book_id")
-    val authors: MutableSet<BookAuthorRef> = mutableSetOf()
+    val authors: Set<BookAuthorRef> = mutableSetOf()
 )
 
 @Table("book_series")
 data class BookSeries(
-    @Id val id: Long, val name: String, val description: String?,
+    @Id val id: Long?, val name: String, val description: String?,
     @MappedCollection(idColumn = "book_series_id", keyColumn = "book_series_id")
     val books: Set<Book>
 )

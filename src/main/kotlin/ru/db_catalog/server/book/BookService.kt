@@ -39,6 +39,14 @@ class BookService(
 
     fun findBookSeriesById(id: Long): Optional<BookSeries> = bookSeriesRepository.findById(id)
 
+    fun findBookSeriesByName(name: String): BookSeries? = bookSeriesRepository.findFirstByName(name)
+
+    fun findBookGenresByIds(ids: Set<Long>): Set<BookGenre> = bookGenreRepository.findAllByIdIn(ids)
+
+    fun saveBookSeries(bookSeries: BookSeries) = bookSeriesRepository.save(bookSeries)
+
+    fun saveBook(book: Book) = bookRepository.save(book)
+
 }
 
 

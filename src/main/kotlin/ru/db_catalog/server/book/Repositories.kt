@@ -7,7 +7,11 @@ import org.springframework.stereotype.Repository
 import ru.db_catalog.server.ContentIdName
 
 @Repository
-interface BookGenreRepository : CrudRepository<BookGenre, Long>
+interface BookGenreRepository : CrudRepository<BookGenre, Long> {
+
+    fun findAllByIdIn(id: Set<Long>): Set<BookGenre>
+
+}
 
 @Repository
 interface BookRepository : CrudRepository<Book, Long> {
@@ -36,7 +40,11 @@ interface BookRepository : CrudRepository<Book, Long> {
 }
 
 @Repository
-interface BookSeriesRepository : CrudRepository<BookSeries, Long>
+interface BookSeriesRepository : CrudRepository<BookSeries, Long> {
+
+    fun findFirstByName(name: String): BookSeries?
+
+}
 
 @Repository
 interface BookPeopleRepository : CrudRepository<BookAuthorRef, Long>

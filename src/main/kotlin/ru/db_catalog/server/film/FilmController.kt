@@ -72,8 +72,8 @@ class FilmController(
             } else null
 
             val book = film.book?.let {
-                val bookTemp = bookService.findBookById(it.id).get()
-                ContentIdName(bookTemp.id, bookTemp.name)
+                val bookTemp = bookService.findBookById(it.id!!).get()
+                ContentIdName(bookTemp.id!!, bookTemp.name)
             }
 
             val musics = mutableSetOf<ContentIdName>()
@@ -88,7 +88,7 @@ class FilmController(
             film.peoples.forEach {
                 val people = peopleService.findPeopleById(it.peopleId).get()
                 val peopleFunction = peopleFunctionService.findPeopleFunctionById(it.peopleFunctionId).get()
-                peoples.add(PeopleWithFunction(people.id, people.fullname, people.yearOfBirth, peopleFunction.name))
+                peoples.add(PeopleWithFunction(people.id!!, people.fullname, people.yearOfBirth, peopleFunction.name))
 
             }
 
