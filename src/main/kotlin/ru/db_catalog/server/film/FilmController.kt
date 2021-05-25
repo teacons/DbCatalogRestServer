@@ -3,9 +3,10 @@ package ru.db_catalog.server.film
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import ru.db_catalog.server.*
+import ru.db_catalog.server.Content
+import ru.db_catalog.server.ContentIdName
+import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.book.BookService
-import ru.db_catalog.server.music.MusicIdName
 import ru.db_catalog.server.music.MusicService
 import ru.db_catalog.server.people.PeopleFunctionService
 import ru.db_catalog.server.people.PeopleService
@@ -79,11 +80,11 @@ class FilmController(
                 ContentIdName(bookTemp.id, bookTemp.name)
             }
 
-            val musics = mutableSetOf<MusicIdName>()
+            val musics = mutableSetOf<ContentIdName>()
 
             film.musics.forEach {
-                val tempMusic = musicService.findById(it.musicId).get()
-                musics.add(MusicIdName(tempMusic.id, tempMusic.name))
+                val tempMusic = musicService.findMusicById(it.musicId).get()
+                musics.add(ContentIdName(tempMusic.id, tempMusic.name))
             }
 
             val peoples = mutableSetOf<PeopleWithFunction>()

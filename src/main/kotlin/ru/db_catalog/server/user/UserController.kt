@@ -7,7 +7,7 @@ import ru.db_catalog.server.AuthResponse
 import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.book.BookService
 import ru.db_catalog.server.film.FilmService
-import ru.db_catalog.server.music.MusicGenreService
+import ru.db_catalog.server.music.MusicService
 import java.sql.Timestamp
 import java.util.*
 
@@ -19,7 +19,7 @@ class UserController(
     val jwtProvider: JwtProvider,
     val bookGenreService: BookService,
     val filmGenreService: FilmService,
-    val musicGenreService: MusicGenreService
+    val musicGenreService: MusicService
 ) {
 
     @GetMapping("/auth")
@@ -266,7 +266,7 @@ class UserController(
         user.likedMusicGenres.clear()
 
         genres.forEach {
-            if (musicGenreService.existsById(it)) user.likedMusicGenres.add(UserMusicGenreRef(it))
+            if (musicGenreService.existsMusicGenreById(it)) user.likedMusicGenres.add(UserMusicGenreRef(it))
         }
 
         userService.save(user)

@@ -14,9 +14,9 @@ import ru.db_catalog.server.user.UserService
 @RequestMapping("/api/music")
 class MusicController(
     val musicService: MusicService,
-    val musicGenreService: MusicGenreService,
-    val musicAlbumService: MusicAlbumService,
-    val artistService: ArtistService,
+    val musicGenreService: MusicService,
+    val musicAlbumService: MusicService,
+    val artistService: MusicService,
     val userService: UserService,
     val musicTopService: MusicTopService,
     val jwtProvider: JwtProvider
@@ -30,26 +30,26 @@ class MusicController(
     ): ResponseEntity<Any> {
         val username = jwtProvider.getLoginFromToken(token.substring(7))
         val userId = userService.findByUsername(username)?.id
-        return prepareMusic(musicService.findById(id).get(), expanded, userId)
+        return prepareMusic(musicService.findMusicById(id).get(), expanded, userId)
     }
 
 
     @GetMapping
-    fun getMusics(): Set<ContentIdName> = musicService.findAllIdName()
+    fun getMusics(): Set<ContentIdName> = musicService.findAllMusicIdName()
 
     fun prepareMusic(music: Music, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
-        var rating = musicService.getRating(music.id)
+        var rating = musicService.getMusicRating(music.id)
 
         if (rating == null) rating = 0.0
 
         val genres = mutableSetOf<String>()
 
         music.musicGenres.forEach {
-            genres.add(musicGenreService.getMusicGenre(it.musicGenreId).get().name)
+            genres.add(musicGenreService.findMusicGenreById(it.musicGenreId).get().name)
         }
 
-        val poster = music.albums.firstOrNull()?.let { musicAlbumService.findById(it.musicAlbumId).get().poster }
+        val poster = music.albums.firstOrNull()?.let { musicAlbumService.findMusicAlbumById(it.musicAlbumId).get().poster }
         if (!expanded) {
             return ResponseEntity(Content(music.id, music.name, music.year, poster, rating, genres), HttpStatus.OK)
         } else {
@@ -58,13 +58,13 @@ class MusicController(
             val albums = mutableSetOf<MusicAlbum>()
 
             music.albums.forEach {
-                albums.add(musicAlbumService.findById(it.musicAlbumId).get())
+                albums.add(musicAlbumService.findMusicAlbumById(it.musicAlbumId).get())
             }
 
             val artists = mutableSetOf<Artist>()
 
             music.artists.forEach {
-                artists.add(artistService.findById(it.artistId).get())
+                artists.add(artistService.findArtistById(it.artistId).get())
             }
 
             val viewed = userService.existsViewByUserIdMusicId(userId, music.id)

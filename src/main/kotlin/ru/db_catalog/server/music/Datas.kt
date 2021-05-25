@@ -57,6 +57,3 @@ data class MusicForAnswer(
     val top: TopIdName?,
     val topPosition: Int?
 )
-
-data class MusicIdName(val id: Long, val name: String)
-

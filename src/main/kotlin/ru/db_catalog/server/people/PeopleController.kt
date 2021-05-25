@@ -10,7 +10,6 @@ import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.book.BookService
 import ru.db_catalog.server.film.FilmService
 import ru.db_catalog.server.music.Artist
-import ru.db_catalog.server.music.ArtistService
 import ru.db_catalog.server.music.MusicService
 import ru.db_catalog.server.user.UserService
 
@@ -24,7 +23,7 @@ class PeopleController(
     val filmService: FilmService,
     val peopleFunctionService: PeopleFunctionService,
     val musicService: MusicService,
-    val musicArtistService: ArtistService
+    val musicArtistService: MusicService
 ) {
 
     @GetMapping("/book")
@@ -76,7 +75,7 @@ class PeopleController(
         val peoples = mutableSetOf<Artist>()
 
         peopleIds.forEach{
-            peoples.add(musicArtistService.findById(it.id).get())
+            peoples.add(musicArtistService.findArtistById(it.id).get())
         }
 
         return ResponseEntity(peoples, HttpStatus.OK)
