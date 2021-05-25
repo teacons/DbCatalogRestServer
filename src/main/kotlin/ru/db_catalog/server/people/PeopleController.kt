@@ -14,13 +14,10 @@ import ru.db_catalog.server.user.UserService
 @RestController
 @RequestMapping("/api/people")
 class PeopleController(
-    val jwtProvider: JwtProvider,
-    val userService: UserService,
     val bookService: BookService,
     val peopleService: PeopleService,
     val filmService: FilmService,
-    val musicService: MusicService,
-    val musicArtistService: MusicService
+    val musicService: MusicService
 ) {
 
     @GetMapping("/book")

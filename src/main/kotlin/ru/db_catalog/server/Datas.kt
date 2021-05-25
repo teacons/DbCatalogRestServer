@@ -12,4 +12,8 @@ data class Content(
 
 data class ContentIdName(val id: Long, val name: String)
 
-data class AuthResponse(val token: String?)
+data class AuthResponse(val token: String?, val role: Long?)
+
+enum class ContentType {
+    BOOK, FILM, MUSIC
+}
