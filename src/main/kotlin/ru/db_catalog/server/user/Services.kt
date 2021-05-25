@@ -2,11 +2,18 @@ package ru.db_catalog.server.user
 
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import ru.db_catalog.server.book.BookRepository
+import ru.db_catalog.server.book.BookService
+import ru.db_catalog.server.film.FilmRepository
+import ru.db_catalog.server.music.MusicRepository
 
 @Service
 class UserService(
     val userRepository: UserRepository,
-    val passwordEncoder: PasswordEncoder
+    val passwordEncoder: PasswordEncoder,
+    val bookRepository: BookRepository,
+    val filmRepository: FilmRepository,
+    val musicRepository: MusicRepository
 ) {
 
     fun findByUsername(username: String) = userRepository.findByUsername(username)
@@ -46,6 +53,18 @@ class UserService(
         userRepository.existsViewByUserIdFilmId(userId, filmId)
 
     fun getUserFilmRating(userId: Long, filmId: Long) = userRepository.getUserFilmRating(userId, filmId)
+
+    fun getBookNamesByIds(ids: Set<Long>) = bookRepository.getNames(ids)
+
+    fun getFilmNamesByIds(ids: Set<Long>) = filmRepository.getNames(ids)
+
+    fun getMusicNamesByIds(ids: Set<Long>) = musicRepository.getNames(ids)
+
+    fun getUserRecommendedBook(genres: Set<Long>) = userRepository.getUserRecommendedBook(genres)
+
+    fun getUserRecommendedFilm(genres: Set<Long>) = userRepository.getUserRecommendedFilm(genres)
+
+    fun getUserRecommendedMusic(genres: Set<Long>) = userRepository.getUserRecommendedMusic(genres)
 
 }
 

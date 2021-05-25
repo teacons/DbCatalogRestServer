@@ -1,4 +1,4 @@
-package ru.db_catalog.server
+package ru.db_catalog.server.people
 
 import org.springframework.stereotype.Service
 
@@ -13,5 +13,7 @@ class PeopleService(val db: PeopleRepository) {
 class PeopleFunctionService(val db: PeopleFunctionRepository) {
 
     fun findById(id: Long) = db.findById(id)
+
+    fun findAll() = db.findAll()
 
 }

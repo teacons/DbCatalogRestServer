@@ -16,13 +16,15 @@ class MusicGenreService(val db: MusicGenreRepository) {
 }
 
 @Service
-class MusicService(val db: MusicRepository) {
+class MusicService(val db: MusicRepository, val artistRepository: ArtistRepository) {
 
     fun findById(id: Long): Optional<Music> = db.findById(id)
 
     fun findAllIdName(): Set<ContentIdName> = db.findAllIdName()
 
     fun getRating(id: Long): Double? = db.getRating(id)
+
+    fun findAllArtists() = artistRepository.findAll()
 
 }
 

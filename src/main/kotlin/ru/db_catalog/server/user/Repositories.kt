@@ -4,6 +4,7 @@ import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import ru.db_catalog.server.ContentIdName
 
 @Repository
 interface UserRepository : CrudRepository<User, Long> {
@@ -31,6 +32,16 @@ interface UserRepository : CrudRepository<User, Long> {
 
     @Query("select rating from user_viewed_film where user_id = :userId and film_id = :filmId")
     fun getUserFilmRating(@Param("userId") userId: Long, @Param("filmId") filmId: Long): Double?
+
+    @Query("select distinct id, name from book join book_has_book_genre on book.id = book_has_book_genre.book_id where book_genre_id in (:genres)")
+    fun getUserRecommendedBook(@Param("genres") genres: Set<Long>): Set<ContentIdName>
+
+    @Query("select distinct id, name from film join film_has_film_genre on film.id = film_has_film_genre.film_id where film_genre_id in (:genres)")
+    fun getUserRecommendedFilm(@Param("genres") genres: Set<Long>): Set<ContentIdName>
+
+    @Query("select distinct id, name from music join music_has_music_genre on music.id = music_has_music_genre.music_id where music_genre_id in (:genres)")
+    fun getUserRecommendedMusic(@Param("genres") genres: Set<Long>): Set<ContentIdName>
+
 
 }
 

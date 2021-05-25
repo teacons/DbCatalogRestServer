@@ -3,7 +3,7 @@ package ru.db_catalog.server.book
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
-import ru.db_catalog.server.People
+import ru.db_catalog.server.people.People
 import ru.db_catalog.server.top.TopIdName
 
 @Table("book_genre")
@@ -53,5 +53,3 @@ data class BookForAnswer(
 )
 
 data class BookSeriesIdName(val id: Long, val name: String)
-
-data class BookIdName(val id: Long, val name: String)

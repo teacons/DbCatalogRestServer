@@ -3,9 +3,9 @@ package ru.db_catalog.server.film
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
-import ru.db_catalog.server.PeopleWithFunction
+import ru.db_catalog.server.ContentIdName
+import ru.db_catalog.server.people.PeopleWithFunction
 import ru.db_catalog.server.book.Book
-import ru.db_catalog.server.book.BookIdName
 import ru.db_catalog.server.music.MusicIdName
 import ru.db_catalog.server.top.TopIdName
 
@@ -53,7 +53,7 @@ data class FilmForAnswer(
     val poster: String?,
     val rating: Double,
     val filmSeries: FilmSeriesIdName?,
-    val book: BookIdName?,
+    val book: ContentIdName?,
     val music: Set<MusicIdName>,
     val peoples: Set<PeopleWithFunction>,
     val genres: Set<String>,

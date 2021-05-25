@@ -6,8 +6,11 @@ import org.springframework.web.bind.annotation.*
 import ru.db_catalog.server.AuthResponse
 import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.book.BookGenreService
+import ru.db_catalog.server.book.BookService
 import ru.db_catalog.server.film.FilmGenreService
+import ru.db_catalog.server.film.FilmService
 import ru.db_catalog.server.music.MusicGenreService
+import ru.db_catalog.server.music.MusicService
 import java.sql.Timestamp
 import java.util.*
 
@@ -319,6 +322,70 @@ class UserController(
         }
 
         return genres
+    }
+
+    @GetMapping("/book")
+    fun getViewedBooks(
+        @RequestHeader("Authorization") token: String
+    ): ResponseEntity<Any> {
+        val username = jwtProvider.getLoginFromToken(token.substring(7))
+        val user = userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+
+        val setOfViewed = user.viewedBook.map { it.bookId }.toSet()
+        return if (setOfViewed.isEmpty()) ResponseEntity(HttpStatus.OK)
+        else ResponseEntity(userService.getBookNamesByIds(setOfViewed), HttpStatus.OK)
+    }
+
+    @GetMapping("/film")
+    fun getViewedFilm(
+        @RequestHeader("Authorization") token: String
+    ): ResponseEntity<Any> {
+        val username = jwtProvider.getLoginFromToken(token.substring(7))
+        val user = userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+
+        val setOfViewed = user.viewedFilm.map { it.filmId }.toSet()
+        return if (setOfViewed.isEmpty()) ResponseEntity(HttpStatus.OK)
+        else ResponseEntity(userService.getFilmNamesByIds(setOfViewed), HttpStatus.OK)
+    }
+
+    @GetMapping("/music")
+    fun getViewedMusics(
+        @RequestHeader("Authorization") token: String
+    ): ResponseEntity<Any> {
+        val username = jwtProvider.getLoginFromToken(token.substring(7))
+        val user = userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+
+        val setOfViewed = user.viewedMusic.map { it.musicId }.toSet()
+        return if (setOfViewed.isEmpty()) ResponseEntity(HttpStatus.OK)
+        else ResponseEntity(userService.getMusicNamesByIds(setOfViewed), HttpStatus.OK)
+    }
+
+    @GetMapping("/recommended/{type}")
+    fun getRecommended(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable type: String
+    ): ResponseEntity<Any> {
+        val username = jwtProvider.getLoginFromToken(token.substring(7))
+        val user = userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+
+        when (type) {
+            "book" -> {
+                val genres = user.likedBookGenres.map { it.bookGenreId }.toSet()
+                if (genres.isEmpty()) return ResponseEntity(HttpStatus.OK)
+                return ResponseEntity(userService.getUserRecommendedBook(genres), HttpStatus.OK)
+            }
+            "film" -> {
+                val genres = user.likedFilmGenres.map { it.filmGenreId }.toSet()
+                if (genres.isEmpty()) return ResponseEntity(HttpStatus.OK)
+                return ResponseEntity(userService.getUserRecommendedFilm(genres), HttpStatus.OK)
+            }
+            "music" -> {
+                val genres = user.likedMusicGenres.map { it.musicGenreId }.toSet()
+                if (genres.isEmpty()) return ResponseEntity(HttpStatus.OK)
+                return ResponseEntity(userService.getUserRecommendedMusic(genres), HttpStatus.OK)
+            }
+            else -> return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
     }
 
 }

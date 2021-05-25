@@ -1,4 +1,4 @@
-package ru.db_catalog.server
+package ru.db_catalog.server.people
 
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
@@ -8,5 +8,3 @@ interface PeopleRepository : CrudRepository<People, Long>
 
 @Repository
 interface PeopleFunctionRepository : CrudRepository<PeopleFunction, Long>
-
-

@@ -18,6 +18,9 @@ interface MusicRepository : CrudRepository<Music, Long> {
     @Query("select id, name from music")
     fun findAllIdName(): Set<ContentIdName>
 
+    @Query("select id, name from music where id in (:ids)")
+    fun getNames(ids: Set<Long>): Set<ContentIdName>
+
 }
 
 @Repository
@@ -25,4 +28,5 @@ interface ArtistRepository : CrudRepository<Artist, Long>
 
 @Repository
 interface MusicAlbumRepository : CrudRepository<MusicAlbum, Long>
+
 

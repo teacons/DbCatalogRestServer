@@ -18,8 +18,18 @@ interface BookRepository : CrudRepository<Book, Long> {
     @Query("select id, name from book")
     fun findAllIdName(): Set<ContentIdName>
 
+    @Query("select id, name from book where id in (:ids)")
+    fun getNames(ids: Set<Long>): Set<ContentIdName>
+
 }
 
 @Repository
 interface BookSeriesRepository : CrudRepository<BookSeries, Long>
 
+@Repository
+interface BookPeopleRepository : CrudRepository<BookAuthorRef, Long> {
+
+    @Query("select distinct people_id from book_has_people")
+    fun findAllBookPeople(): Set<Long>
+
+}

@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.db_catalog.server.*
+import ru.db_catalog.server.people.People
+import ru.db_catalog.server.people.PeopleService
 import ru.db_catalog.server.top.BookTopService
 import ru.db_catalog.server.top.TopIdName
 import ru.db_catalog.server.user.UserService

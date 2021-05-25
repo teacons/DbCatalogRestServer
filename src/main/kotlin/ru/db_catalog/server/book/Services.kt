@@ -16,13 +16,15 @@ class BookGenreService(val db: BookGenreRepository) {
 }
 
 @Service
-class BookService(val db: BookRepository) {
+class BookService(val db: BookRepository, val bookPeopleRepository: BookPeopleRepository) {
 
     fun findById(id: Long): Optional<Book> = db.findById(id)
 
     fun findAllIdName(): Set<ContentIdName> = db.findAllIdName()
 
     fun getRating(id: Long): Double? = db.getRating(id)
+
+    fun findAllBookPeople() = bookPeopleRepository.findAllBookPeople()
 
 }
 
