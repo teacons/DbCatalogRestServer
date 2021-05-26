@@ -12,11 +12,11 @@ data class Music(
     val year: Int,
     val duration: Int,
     @MappedCollection(idColumn = "music_id")
-    val musicGenres: Set<MusicGenreRef> = mutableSetOf(),
+    val musicGenres: Set<MusicGenreRef>,
     @MappedCollection(idColumn = "music_id")
-    val artists: Set<MusicAuthorRef> = mutableSetOf(),
+    val artists: Set<MusicAuthorRef>,
     @MappedCollection(idColumn = "music_id")
-    val albums: Set<MusicAlbumRef> = mutableSetOf()
+    val albums: Set<MusicAlbumRef>
 )
 
 @Table("music_has_music_genre")

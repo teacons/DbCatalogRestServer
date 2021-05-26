@@ -18,9 +18,9 @@ data class Book(
     val poster: String?,
     val bookSeriesId: Long?,
     @MappedCollection(idColumn = "book_id")
-    val bookGenres: Set<BookGenreRef> = mutableSetOf(),
+    val bookGenres: Set<BookGenreRef>,
     @MappedCollection(idColumn = "book_id")
-    val authors: Set<BookAuthorRef> = mutableSetOf()
+    val authors: Set<BookAuthorRef>
 )
 
 @Table("book_series")

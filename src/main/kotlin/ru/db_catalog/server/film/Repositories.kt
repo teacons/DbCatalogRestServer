@@ -4,9 +4,14 @@ import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 import ru.db_catalog.server.ContentIdName
+import ru.db_catalog.server.book.BookGenre
 
 @Repository
-interface FilmGenreRepository : CrudRepository<FilmGenre, Long>
+interface FilmGenreRepository : CrudRepository<FilmGenre, Long> {
+
+    fun findAllByIdIn(id: Set<Long>): Set<FilmGenre>
+
+}
 
 @Repository
 interface FilmRepository : CrudRepository<Film, Long> {

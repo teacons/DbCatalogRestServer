@@ -37,6 +37,8 @@ interface BookRepository : CrudRepository<Book, Long> {
     @Query("select distinct id from book join book_has_book_genre on book.id = book_has_book_genre.book_id where book_has_book_genre.book_genre_id in (:genres)")
     fun findAllByGenres(@Param("genres") genres: Set<Long>): Set<Long>
 
+    fun findByName(name: String): Book?
+
 }
 
 @Repository

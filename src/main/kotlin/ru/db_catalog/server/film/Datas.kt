@@ -9,7 +9,7 @@ import ru.db_catalog.server.people.PeopleWithFunction
 
 @Table("film")
 data class Film(
-    @Id val id: Long,
+    @Id val id: Long?,
     val name: String,
     val year: Int,
     val duration: Int,
@@ -19,11 +19,11 @@ data class Film(
     @MappedCollection(idColumn = "id")
     val book: Book?,
     @MappedCollection(idColumn = "film_id")
-    val filmGenres: MutableSet<FilmGenreRef> = mutableSetOf(),
+    val filmGenres: Set<FilmGenreRef>,
     @MappedCollection(idColumn = "film_id")
-    val peoples: MutableSet<FilmPeopleRef> = mutableSetOf(),
+    val peoples: Set<FilmPeopleRef>,
     @MappedCollection(idColumn = "film_id")
-    val musics: MutableSet<FilmMusicRef> = mutableSetOf()
+    val musics: Set<FilmMusicRef>
 )
 
 @Table("film_series")

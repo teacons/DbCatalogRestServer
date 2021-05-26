@@ -45,7 +45,7 @@ class PeopleController(
     fun getMusicArtists(): ResponseEntity<Any> {
         val peopleIds = musicService.findAllArtists().map { it.id!! }.toSet()
 
-        return ResponseEntity(peopleService.findAllPeopleByIdInContentIdName(peopleIds), HttpStatus.OK)
+        return ResponseEntity(musicService.findAllArtistsByIdInContentIdName(peopleIds), HttpStatus.OK)
     }
 
     @GetMapping("/functions")

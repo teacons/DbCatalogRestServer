@@ -42,7 +42,7 @@ class FilmController(
 
     fun prepareFilm(film: Film, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
-        var rating = filmService.getFilmRating(film.id)
+        var rating = filmService.getFilmRating(film.id!!)
 
         if (rating == null) rating = 0.0
 

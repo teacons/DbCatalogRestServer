@@ -57,7 +57,7 @@ class UserService(
 
     fun getFilmNamesByIds(ids: Set<Long>) = filmRepository.findIdNameByIds(ids)
 
-    fun getMusicNamesByIds(ids: Set<Long>) = musicRepository.getNames(ids)
+    fun getMusicNamesByIds(ids: Set<Long>) = musicRepository.findIdNameByIds(ids)
 
     fun getUserRecommendedBook(genres: Set<Long>) = userRepository.getUserRecommendedBook(genres)
 

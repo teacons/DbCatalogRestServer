@@ -37,6 +37,7 @@ class BookFilterController(
 
         if (bookByGenres != null) intersected = intersected.intersect(bookByGenres)
 
-        return ResponseEntity(bookService.findBookIdNameByIds(intersected), HttpStatus.OK)
+        return if (intersected.isEmpty()) ResponseEntity(HttpStatus.OK)
+        else ResponseEntity(bookService.findBookIdNameByIds(intersected), HttpStatus.OK)
     }
 }

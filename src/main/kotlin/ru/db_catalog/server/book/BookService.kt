@@ -47,6 +47,8 @@ class BookService(
 
     fun saveBook(book: Book) = bookRepository.save(book)
 
+    fun findBookByName(name: String) = bookRepository.findByName(name)
+
 }
 
 

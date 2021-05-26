@@ -42,6 +42,22 @@ class MusicService(
 
     fun saveMusic(music: Music) = musicRepository.save(music)
 
+    fun getMusicByYears(years: Pair<Int, Int>) =
+        musicRepository.findAllByYearBetween(years.first, years.second)
+
+    fun findAllByRatings(ratings: Pair<Int, Int>) = musicRepository.findAllByRatings(ratings.first, ratings.second)
+
+    fun findAllByDuration(duration: Int, duration2: Int) = musicRepository.findAllByDuration(duration, duration2)
+
+    fun findAllByGenres(genres: Set<Long>) = musicRepository.findAllByGenres(genres)
+
+    fun findAllByArtists(artists: Set<Long>) = musicRepository.findAllByArtists(artists)
+
+    fun findMusicIdNameByIds(ids: Set<Long>): Set<ContentIdName> = musicRepository.findIdNameByIds(ids)
+
+    fun findAllArtistsByIdInContentIdName(ids: Set<Long>) = artistRepository.findAllByIdInContentIdName(ids)
+
+    fun findMusicByName(name: String) = musicRepository.findByName(name)
 
 }
 

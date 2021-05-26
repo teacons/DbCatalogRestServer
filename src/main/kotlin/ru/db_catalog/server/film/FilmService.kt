@@ -20,10 +20,10 @@ class FilmService(
 
     fun getFilmRating(id: Long): Double? = filmRepository.getRating(id)
 
-    fun getBooksBetweenYears(years: Pair<Int, Int>) =
+    fun getFilmsByYears(years: Pair<Int, Int>) =
         filmRepository.findAllByYearBetween(years.first, years.second)
 
-    fun findAllByRatings(ratings: Pair<Int, Int>) = filmRepository.findAllByRatings(ratings.first, ratings.second)
+    fun findFilmsByRatings(ratings: Pair<Int, Int>) = filmRepository.findAllByRatings(ratings.first, ratings.second)
 
     fun findAllByActors(actors: Set<Long>) = filmRepository.findAllByActors(actors)
 
@@ -43,6 +43,8 @@ class FilmService(
 
     fun findFilmGenreById(id: Long): Optional<FilmGenre> = filmGenreRepository.findById(id)
 
+    fun findFilmGenresByIds(ids: Set<Long>): Set<FilmGenre> = filmGenreRepository.findAllByIdIn(ids)
+
     fun existsFilmGenreById(id: Long) = filmGenreRepository.existsById(id)
 
     fun findFilmSeriesById(id: Long): Optional<FilmSeries> = filmSeriesRepository.findById(id)
@@ -52,5 +54,7 @@ class FilmService(
     fun saveFilmSeries(filmSeries: FilmSeries) = filmSeriesRepository.save(filmSeries)
 
     fun findAllPeopleByNameIn(names: Set<String>) = filmPeopleRepository
+
+    fun saveFilm(film: Film) = filmRepository.save(film)
 
 }
