@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.RestController
 class FilmFilterController(
     val filmService: FilmService
 ) {
-    @GetMapping()
+    @GetMapping
     fun filterFilm(
         @RequestParam(value = "genres", required = false) genres: Set<Long>?,
-        @RequestParam(value = "authors", required = false) authors: Set<Long>?,
+        @RequestParam(value = "actors", required = false) actors: Set<Long>?,
+        @RequestParam(value = "creators", required = false) creators: Set<Long>?,
         @RequestParam(value = "duration_down", required = true) durationDown: Int,
         @RequestParam(value = "duration_up", required = true) durationUp: Int,
         @RequestParam(value = "year_down", required = true) yearDown: Int,
@@ -31,16 +32,21 @@ class FilmFilterController(
 
         val filmByDuration = filmService.findAllByDuration(durationDown, durationUp)
 
-        val filmByAuthors = if (authors != null) filmService.findAllByAuthors(authors) else null
+        val filmByActors = if (actors != null) filmService.findAllByActors(actors) else null
+
+        val filmByCreators = if (creators != null) filmService.findAllByCreators(creators) else null
 
         val filmByGenres = if (genres != null) filmService.findAllByGenres(genres) else null
 
         var intersected = filmByRating.intersect(filmByYears).intersect(filmByDuration)
 
-        if (filmByAuthors != null) intersected = intersected.intersect(filmByAuthors)
+        if (filmByActors != null) intersected = intersected.intersect(filmByActors)
+
+        if (filmByCreators != null) intersected = intersected.intersect(filmByCreators)
 
         if (filmByGenres != null) intersected = intersected.intersect(filmByGenres)
 
-        return ResponseEntity(filmService.findFilmIdNameByIds(intersected), HttpStatus.OK)
+        return if (intersected.isEmpty()) ResponseEntity(HttpStatus.OK)
+        else ResponseEntity(filmService.findFilmIdNameByIds(intersected), HttpStatus.OK)
     }
 }

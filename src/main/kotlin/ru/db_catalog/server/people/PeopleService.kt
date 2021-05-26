@@ -1,6 +1,7 @@
 package ru.db_catalog.server.people
 
 import org.springframework.stereotype.Service
+import ru.db_catalog.server.ContentIdName
 import java.util.*
 
 @Service
@@ -12,6 +13,8 @@ class PeopleService(
     fun findPeopleById(id: Long): Optional<People> = peopleRepository.findById(id)
 
     fun findAllPeopleByIdIn(ids: Set<Long>): Set<People> = peopleRepository.findAllByIdIn(ids)
+
+    fun findAllPeopleByIdInContentIdName(ids: Set<Long>): Set<ContentIdName> = peopleRepository.findIdsInContentIdName(ids)
 
     fun findPeopleFunctionById(id: Long): Optional<PeopleFunction> = peopleFunctionRepository.findById(id)
 

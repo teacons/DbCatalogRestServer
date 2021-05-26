@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ru.db_catalog.server.ContentIdName
 
 @RestController
 @RequestMapping("/api/book/filter")
@@ -14,7 +13,7 @@ class BookFilterController(
     val bookService: BookService
 ) {
 
-    @GetMapping()
+    @GetMapping
     fun filterBook(
         @RequestParam(value = "genres", required = false) genres: Set<Long>?,
         @RequestParam(value = "authors", required = false) authors: Set<Long>?,

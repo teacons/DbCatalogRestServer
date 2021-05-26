@@ -68,7 +68,7 @@ class FilmController(
             val filmSeries = if (film.filmSeriesId != null) {
                 val filmSeries = filmService.findFilmSeriesById(film.filmSeriesId).get()
 
-                ContentIdName(filmSeries.id, filmSeries.name)
+                ContentIdName(filmSeries.id!!, filmSeries.name)
             } else null
 
             val book = film.book?.let {
@@ -80,7 +80,7 @@ class FilmController(
 
             film.musics.forEach {
                 val tempMusic = musicService.findMusicById(it.musicId).get()
-                musics.add(ContentIdName(tempMusic.id, tempMusic.name))
+                musics.add(ContentIdName(tempMusic.id!!, tempMusic.name))
             }
 
             val peoples = mutableSetOf<PeopleWithFunction>()

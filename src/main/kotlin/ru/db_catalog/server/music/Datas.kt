@@ -7,16 +7,16 @@ import ru.db_catalog.server.ContentIdName
 
 @Table("music")
 data class Music(
-    @Id val id: Long,
+    @Id val id: Long?,
     val name: String,
     val year: Int,
     val duration: Int,
     @MappedCollection(idColumn = "music_id")
-    val musicGenres: MutableSet<MusicGenreRef> = mutableSetOf(),
+    val musicGenres: Set<MusicGenreRef> = mutableSetOf(),
     @MappedCollection(idColumn = "music_id")
-    val artists: MutableSet<MusicAuthorRef> = mutableSetOf(),
+    val artists: Set<MusicAuthorRef> = mutableSetOf(),
     @MappedCollection(idColumn = "music_id")
-    val albums: MutableSet<MusicAlbumRef> = mutableSetOf()
+    val albums: Set<MusicAlbumRef> = mutableSetOf()
 )
 
 @Table("music_has_music_genre")
@@ -29,14 +29,14 @@ data class MusicAuthorRef(val artistId: Long)
 data class MusicAlbumRef(val musicAlbumId: Long)
 
 @Table("artist")
-data class Artist(@Id val id: Long, val name: String, val description: String?)
+data class Artist(@Id val id: Long?, val name: String, val description: String?)
 
 @Table("music_genre")
 data class MusicGenre(@Id val id: Long, val name: String, val description: String)
 
 @Table("music_album")
 data class MusicAlbum(
-    @Id val id: Long,
+    @Id val id: Long?,
     val name: String,
     val year: Int,
     val poster: String?,

@@ -57,13 +57,17 @@ class SecurityConfig(val jwtFilter: JwtFilter) : WebSecurityConfigurerAdapter() 
             .authorizeRequests()
             .antMatchers("/api/moderate/*").hasRole("MODERATOR")
             .antMatchers(
-                "/api/film/*",
-                "/api/music/*",
-                "/api/book/*",
-                "/api/film_genre/*",
-                "/api/music_genre/*",
-                "/api/book_genre/*",
-                "/api/user/*"
+                "/api/film**",
+                "/api/music**",
+                "/api/book**",
+                "/api/*genre**",
+                "/api/user/genre/**",
+                "/api/user/update/**",
+                "/api/user/recommended**",
+                "/api/*/filter*",
+                "/api/user/info**",
+                "/api/people/*",
+                "/api/top/**",
             ).hasRole("USER")
             .antMatchers("/api/user/auth*", "/api/user/reg*").permitAll()
             .and()

@@ -30,6 +30,19 @@ class MusicService(
 
     fun findMusicAlbumById(id: Long): Optional<MusicAlbum> = musicAlbumRepository.findById(id)
 
+    fun findMusicAlbumByName(name: String) = musicAlbumRepository.findFirstByName(name)
+
+    fun saveMusicAlbum(musicAlbum: MusicAlbum) = musicAlbumRepository.save(musicAlbum)
+
+    fun saveArtists(artist: Artist) = artistRepository.save(artist)
+
+    fun findAllArtistsByNameIn(names: Set<String>) = artistRepository.findAllByNameIn(names)
+
+    fun findMusicGenresByIds(ids: Set<Long>) = musicGenreRepository.findAllByIdIn(ids)
+
+    fun saveMusic(music: Music) = musicRepository.save(music)
+
+
 }
 
 

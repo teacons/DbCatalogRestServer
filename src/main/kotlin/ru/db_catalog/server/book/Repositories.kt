@@ -28,7 +28,7 @@ interface BookRepository : CrudRepository<Book, Long> {
     @Query("select id from book where year between :year and :year2")
     fun findAllByYearBetween(year: Int, year2: Int): Set<Long>
 
-    @Query("with tmp as (select book_id, round(avg(rating), 2) as rating from user_viewed_book where rating >= :down and rating <= :up group by book_id) select book_id from tmp")
+    @Query("with tmp as (select distinct book_id, round(avg(rating) OVER (PARTITION BY book_id), 2) as book_rating from user_viewed_book) select book_id from tmp where book_rating >= :down and book_rating <= :up")
     fun findAllByRatings(@Param("down") down: Int, @Param("up") up: Int): Set<Long>
 
     @Query("select distinct id from book join book_has_people on book.id = book_has_people.book_id where people_id in (:authors)")

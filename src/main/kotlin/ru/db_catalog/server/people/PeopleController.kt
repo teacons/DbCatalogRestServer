@@ -4,12 +4,11 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ru.db_catalog.server.JwtProvider
 import ru.db_catalog.server.book.BookService
 import ru.db_catalog.server.film.FilmService
 import ru.db_catalog.server.music.MusicService
-import ru.db_catalog.server.user.UserService
 
 @RestController
 @RequestMapping("/api/people")
@@ -24,38 +23,29 @@ class PeopleController(
     fun getBookPeoples(): ResponseEntity<Any> {
         val peopleIds = bookService.findAllBookPeoples().map { it.peopleId }.toSet()
 
-        return ResponseEntity(peopleService.findAllPeopleByIdIn(peopleIds), HttpStatus.OK)
+        return ResponseEntity(peopleService.findAllPeopleByIdInContentIdName(peopleIds), HttpStatus.OK)
     }
 
     @GetMapping("/film")
-    fun getFilmPeoples(): ResponseEntity<Any> {
-        val peopleIds = filmService.findAllFilmPeople().toSet()
+    fun getFilmPeoples(
+        @RequestParam(value = "actors", required = false) actors: Boolean = false,
+    ): ResponseEntity<Any> {
 
-        val peoples = peopleService.findAllPeopleByIdIn(peopleIds.map { it.peopleId }.toSet())
+        val peopleIds = if (actors)
+            filmService.findAllFilmPeopleByPeopleFunction(2).toSet()
+        else
+            filmService.findAllFilmPeopleWithoutPeopleFunction(2).toSet()
 
-        val answer = mutableSetOf<PeopleWithFunction>()
+        val peoples = peopleService.findAllPeopleByIdInContentIdName(peopleIds.map { it.peopleId }.toSet())
 
-        for (i in peoples.indices) {
-            peoples.elementAt(i).run {
-                answer.add(
-                    PeopleWithFunction(
-                        this.id!!,
-                        this.fullname,
-                        this.yearOfBirth,
-                        peopleService.findPeopleFunctionById(peopleIds.elementAt(i).peopleFunctionId).get().name
-                    )
-                )
-            }
-        }
-
-        return ResponseEntity(answer, HttpStatus.OK)
+        return ResponseEntity(peoples, HttpStatus.OK)
     }
 
     @GetMapping("/music")
     fun getMusicArtists(): ResponseEntity<Any> {
-        val peopleIds = musicService.findAllArtists().map { it.id }.toSet()
+        val peopleIds = musicService.findAllArtists().map { it.id!! }.toSet()
 
-        return ResponseEntity(peopleService.findAllPeopleByIdIn(peopleIds), HttpStatus.OK)
+        return ResponseEntity(peopleService.findAllPeopleByIdInContentIdName(peopleIds), HttpStatus.OK)
     }
 
     @GetMapping("/functions")

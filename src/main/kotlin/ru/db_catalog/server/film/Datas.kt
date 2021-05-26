@@ -28,9 +28,9 @@ data class Film(
 
 @Table("film_series")
 data class FilmSeries(
-    @Id val id: Long, val name: String, val description: String?,
+    @Id val id: Long?, val name: String, val description: String?,
     @MappedCollection(idColumn = "film_series_id", keyColumn = "film_series_id")
-    val books: List<Film>
+    val films: Set<Film>
 )
 
 @Table("film_has_film_genre")

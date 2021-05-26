@@ -5,9 +5,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.db_catalog.server.AuthResponse
 import ru.db_catalog.server.JwtProvider
-import ru.db_catalog.server.book.BookService
-import ru.db_catalog.server.film.FilmService
-import ru.db_catalog.server.music.MusicService
 import java.sql.Timestamp
 import java.util.*
 

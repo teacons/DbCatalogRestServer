@@ -2,7 +2,6 @@ package ru.db_catalog.server.film
 
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import ru.db_catalog.server.ContentIdName
 
@@ -24,11 +23,14 @@ interface FilmRepository : CrudRepository<Film, Long> {
     @Query("select id from film where year between :year and :year2")
     fun findAllByYearBetween(year: Int, year2: Int): Set<Long>
 
-    @Query("with tmp as (select film_id, round(avg(rating), 2) as rating from user_viewed_film where rating >= :down and rating <= :up group by film_id) select film_id from tmp")
+    @Query("with tmp as (select distinct film_id, round(avg(rating) OVER (PARTITION BY film_id), 2) as film_rating from user_viewed_film) select film_id from tmp where film_rating >= :down and film_rating <= :up")
     fun findAllByRatings(down: Int, up: Int): Set<Long>
 
-    @Query("select distinct id from film join film_has_people on film.id = film_has_people.film_id where people_id in (:authors)")
-    fun findAllByAuthors(authors: Set<Long>): Set<Long>
+    @Query("select distinct id from film join film_has_people on film.id = film_has_people.film_id where people_id in (:authors) and people_function_id = 2")
+    fun findAllByActors(authors: Set<Long>): Set<Long>
+
+    @Query("select distinct id from film join film_has_people on film.id = film_has_people.film_id where people_id in (:authors) and people_function_id != 2")
+    fun findAllByCreators(authors: Set<Long>): Set<Long>
 
     @Query("select distinct id from film join film_has_film_genre on film.id = film_has_film_genre.film_id where film_has_film_genre.film_genre_id in (:genres)")
     fun findAllByGenres(genres: Set<Long>): Set<Long>
@@ -39,7 +41,17 @@ interface FilmRepository : CrudRepository<Film, Long> {
 }
 
 @Repository
-interface FilmSeriesRepository : CrudRepository<FilmSeries, Long>
+interface FilmSeriesRepository : CrudRepository<FilmSeries, Long> {
+
+    fun findFirstByName(name: String): FilmSeries?
+
+}
 
 @Repository
-interface FilmPeopleRepository : CrudRepository<FilmPeopleRef, Long>
+interface FilmPeopleRepository : CrudRepository<FilmPeopleRef, Long> {
+
+    fun findAllByPeopleFunctionId(peopleFunctionId: Long): Set<FilmPeopleRef>
+
+    fun findAllByPeopleFunctionIdNot(peopleFunctionId: Long): Set<FilmPeopleRef>
+
+}

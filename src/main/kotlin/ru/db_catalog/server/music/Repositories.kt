@@ -7,7 +7,11 @@ import org.springframework.stereotype.Repository
 import ru.db_catalog.server.ContentIdName
 
 @Repository
-interface MusicGenreRepository : CrudRepository<MusicGenre, Long>
+interface MusicGenreRepository : CrudRepository<MusicGenre, Long> {
+
+    fun findAllByIdIn(id: Set<Long>): Set<MusicGenre>
+
+}
 
 @Repository
 interface MusicRepository : CrudRepository<Music, Long> {
@@ -24,9 +28,17 @@ interface MusicRepository : CrudRepository<Music, Long> {
 }
 
 @Repository
-interface ArtistRepository : CrudRepository<Artist, Long>
+interface ArtistRepository : CrudRepository<Artist, Long> {
+
+    fun findAllByNameIn(name: Set<String>): Set<Artist>
+
+}
 
 @Repository
-interface MusicAlbumRepository : CrudRepository<MusicAlbum, Long>
+interface MusicAlbumRepository : CrudRepository<MusicAlbum, Long> {
+
+    fun findFirstByName(name: String): MusicAlbum?
+
+}
 
 

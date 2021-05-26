@@ -25,13 +25,19 @@ class FilmService(
 
     fun findAllByRatings(ratings: Pair<Int, Int>) = filmRepository.findAllByRatings(ratings.first, ratings.second)
 
-    fun findAllByAuthors(authors: Set<Long>) = filmRepository.findAllByAuthors(authors)
+    fun findAllByActors(actors: Set<Long>) = filmRepository.findAllByActors(actors)
+
+    fun findAllByCreators(creators: Set<Long>) = filmRepository.findAllByCreators(creators)
 
     fun findAllByGenres(genres: Set<Long>) = filmRepository.findAllByGenres(genres)
 
     fun findAllByDuration(duration: Int, duration2: Int) = filmRepository.findAllByDuration(duration, duration2)
 
     fun findAllFilmPeople(): MutableIterable<FilmPeopleRef> = filmPeopleRepository.findAll()
+
+    fun findAllFilmPeopleWithoutPeopleFunction(functionId: Long): Set<FilmPeopleRef> = filmPeopleRepository.findAllByPeopleFunctionIdNot(functionId)
+
+    fun findAllFilmPeopleByPeopleFunction(functionId: Long): Set<FilmPeopleRef> = filmPeopleRepository.findAllByPeopleFunctionId(functionId)
 
     fun findAllFilmGenres(): MutableIterable<FilmGenre> = filmGenreRepository.findAll()
 
@@ -40,5 +46,11 @@ class FilmService(
     fun existsFilmGenreById(id: Long) = filmGenreRepository.existsById(id)
 
     fun findFilmSeriesById(id: Long): Optional<FilmSeries> = filmSeriesRepository.findById(id)
+
+    fun findFilmSeriesByName(name: String) = filmSeriesRepository.findFirstByName(name)
+
+    fun saveFilmSeries(filmSeries: FilmSeries) = filmSeriesRepository.save(filmSeries)
+
+    fun findAllPeopleByNameIn(names: Set<String>) = filmPeopleRepository
 
 }

@@ -13,7 +13,7 @@ class UserMediaGetterController(
     val jwtProvider: JwtProvider
 ) {
 
-    @GetMapping("/genre/{type}}")
+    @GetMapping("/genre/{type}")
     fun getGenres(
         @RequestHeader("Authorization") token: String,
         @PathVariable type: String

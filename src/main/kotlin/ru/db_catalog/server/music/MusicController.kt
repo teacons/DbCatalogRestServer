@@ -35,7 +35,7 @@ class MusicController(
 
     fun prepareMusic(music: Music, expanded: Boolean, userId: Long?): ResponseEntity<Any> {
 
-        var rating = musicService.getMusicRating(music.id)
+        var rating = musicService.getMusicRating(music.id!!)
 
         if (rating == null) rating = 0.0
 
