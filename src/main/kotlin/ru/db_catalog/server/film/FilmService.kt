@@ -53,4 +53,8 @@ class FilmService(
 
     fun saveFilm(film: Film) = filmRepository.save(film)
 
+    fun findFilmByName(name: String) = filmRepository.findFirstByName(name)
+
+
+
 }

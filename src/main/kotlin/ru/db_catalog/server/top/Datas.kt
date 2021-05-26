@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table
 
 @Table("top")
 data class BookTop(
-    @Id val id: Long, val name: String,
+    @Id val id: Long?, val name: String,
     @MappedCollection(idColumn = "top_id", keyColumn = "top_id")
     val content: MutableSet<BookTopRef> = mutableSetOf()
 )
@@ -17,7 +17,7 @@ data class BookTopRef(@Column("book_id") val id: Long, val position: Int)
 
 @Table("top")
 data class FilmTop(
-    @Id val id: Long, val name: String,
+    @Id val id: Long?, val name: String,
     @MappedCollection(idColumn = "top_id")
     val content: MutableSet<FilmTopRef> = mutableSetOf(),
 )
@@ -27,7 +27,7 @@ data class FilmTopRef(@Column("film_id") val id: Long, val position: Int)
 
 @Table("top")
 data class MusicTop(
-    @Id val id: Long, val name: String,
+    @Id val id: Long?, val name: String,
     @MappedCollection(idColumn = "top_id")
     val content: MutableSet<MusicTopRef> = mutableSetOf(),
 )

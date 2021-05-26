@@ -14,6 +14,7 @@ class BookTopService(val db: BookTopRepository) {
 
     fun findAllIdName() = db.findAllIdName()
 
+    fun saveTop(bookTop: BookTop) = db.save(bookTop)
 
 }
 
@@ -27,6 +28,9 @@ class MusicTopService(val db: MusicTopRepository) {
     fun findPositionInTop(topId: Long, musicId: Long) = db.findPositionInTop(topId, musicId)
 
     fun findAllIdName() = db.findAllIdName()
+
+    fun saveTop(musicTop: MusicTop) = db.save(musicTop)
+
 }
 
 @Service
@@ -39,5 +43,7 @@ class FilmTopService(val db: FilmTopRepository) {
     fun findPositionInTop(topId: Long, filmId: Long) = db.findPositionInTop(topId, filmId)
 
     fun findAllIdName() = db.findAllIdName()
+
+    fun saveTop(filmTop: FilmTop) = db.save(filmTop)
 
 }

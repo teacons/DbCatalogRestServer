@@ -97,8 +97,8 @@ class FilmController(
             val userRating = userService.getUserFilmRating(userId, film.id)
 
             val top = filmTopService.findByFilmId(film.id).firstOrNull()
-            val topIdName = top?.let { ContentIdName(it.id, it.name) }
-            val topPosition = top?.let { filmTopService.findPositionInTop(it.id, film.id) }
+            val topIdName = top?.let { ContentIdName(it.id!!, it.name) }
+            val topPosition = top?.let { filmTopService.findPositionInTop(it.id!!, film.id) }
 
 
             return ResponseEntity(

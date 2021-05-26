@@ -68,8 +68,8 @@ class BookController(
             val userRating = userService.getUserBookRating(userId, book.id)
 
             val top = bookTopService.findByBookId(book.id).firstOrNull()
-            val topIdName = top?.let { ContentIdName(it.id, it.name) }
-            val topPosition = top?.let { bookTopService.findPositionInTop(it.id, book.id) }
+            val topIdName = top?.let { ContentIdName(it.id!!, it.name) }
+            val topPosition = top?.let { bookTopService.findPositionInTop(it.id!!, book.id) }
 
             return ResponseEntity(
                 BookForAnswer(

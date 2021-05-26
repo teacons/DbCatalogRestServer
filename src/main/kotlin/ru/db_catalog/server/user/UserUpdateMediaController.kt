@@ -84,35 +84,27 @@ class UserUpdateMediaController(
         }
     }
 
-    @PostMapping("/genre/{type}")
+    @PostMapping("/genre")
     fun updateGenre(
         @RequestHeader("Authorization") token: String,
-        @RequestParam("genres") genres: Set<Long>,
-        @PathVariable type: String
+        @RequestParam("book_genres") book_genres: Set<Long>,
+        @RequestParam("film_genres") film_genres: Set<Long>,
+        @RequestParam("music_genres") music_genres: Set<Long>,
     ): ResponseEntity<Any> {
         val username = jwtProvider.getLoginFromToken(token.substring(7))
         val user = userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
 
-        when (type) {
-            "book" -> {
-                user.likedBookGenres.clear()
-                genres.forEach {
-                    if (bookGenreService.existsBookGenreById(it)) user.likedBookGenres.add(UserBookGenreRef(it))
-                }
-            }
-            "film" -> {
-                user.likedFilmGenres.clear()
-                genres.forEach {
-                    if (filmGenreService.existsFilmGenreById(it)) user.likedFilmGenres.add(UserFilmGenreRef(it))
-                }
-            }
-            "music" -> {
-                user.likedMusicGenres.clear()
-                genres.forEach {
-                    if (musicGenreService.existsMusicGenreById(it)) user.likedMusicGenres.add(UserMusicGenreRef(it))
-                }
-            }
-            else -> return ResponseEntity(HttpStatus.BAD_REQUEST)
+        user.likedBookGenres.clear()
+        book_genres.forEach {
+            if (bookGenreService.existsBookGenreById(it)) user.likedBookGenres.add(UserBookGenreRef(it))
+            user.likedFilmGenres.clear()
+        }
+        film_genres.forEach {
+            if (filmGenreService.existsFilmGenreById(it)) user.likedFilmGenres.add(UserFilmGenreRef(it))
+        }
+        user.likedMusicGenres.clear()
+        music_genres.forEach {
+            if (musicGenreService.existsMusicGenreById(it)) user.likedMusicGenres.add(UserMusicGenreRef(it))
         }
 
         userService.save(user)

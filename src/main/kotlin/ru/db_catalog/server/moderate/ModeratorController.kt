@@ -4,16 +4,15 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import ru.db_catalog.server.ErrorCode
 import ru.db_catalog.server.book.*
 import ru.db_catalog.server.film.*
 import ru.db_catalog.server.music.*
 import ru.db_catalog.server.people.People
 import ru.db_catalog.server.people.PeopleService
+import ru.db_catalog.server.top.*
+import javax.xml.transform.OutputKeys
 
 @RestController
 @RequestMapping("/api/moderate")
@@ -22,6 +21,9 @@ class ModeratorController(
     val musicService: MusicService,
     val filmService: FilmService,
     val peopleService: PeopleService,
+    val bookTopService: BookTopService,
+    val filmTopService: FilmTopService,
+    val musicTopService: MusicTopService
 ) {
 
     @PostMapping("/book")
@@ -227,6 +229,53 @@ class ModeratorController(
             )
 
         filmService.saveFilm(film)
+
+        return ResponseEntity(ErrorCode(0), HttpStatus.OK)
+
+    }
+
+    @PostMapping("/top/{type}")
+    fun addTop(
+        @PathVariable type: String,
+        @RequestParam(value = "name", required = true) name: String,
+        @RequestParam(value = "contents", required = true) contentsFrom: String
+    ): ResponseEntity<Any> {
+
+        val contents = ObjectMapper().readValue(contentsFrom, object : TypeReference<Map<Int, String>>() {})
+
+        when (type) {
+
+            "book" -> {
+                val topRefs = mutableSetOf<BookTopRef>()
+                contents.forEach{
+                    val book = bookService.findBookByName(it.value) ?: return ResponseEntity(ErrorCode(12), HttpStatus.OK)
+                    topRefs.add(BookTopRef(book.id!!, it.key))
+                }
+
+                bookTopService.saveTop(BookTop(null, name, topRefs))
+            }
+
+            "film" -> {
+                val topRefs = mutableSetOf<FilmTopRef>()
+                contents.forEach{
+                    val film = filmService.findFilmByName(it.value) ?: return ResponseEntity(ErrorCode(13), HttpStatus.OK)
+                    topRefs.add(FilmTopRef(film.id!!, it.key))
+                }
+
+                filmTopService.saveTop(FilmTop(null, name, topRefs))
+            }
+
+            "music" -> {
+                val topRefs = mutableSetOf<MusicTopRef>()
+                contents.forEach{
+                    val music = musicService.findMusicByName(it.value) ?: return ResponseEntity(ErrorCode(14), HttpStatus.OK)
+                    topRefs.add(MusicTopRef(music.id!!, it.key))
+                }
+
+                musicTopService.saveTop(MusicTop(null, name, topRefs))
+            }
+
+        }
 
         return ResponseEntity(ErrorCode(0), HttpStatus.OK)
 

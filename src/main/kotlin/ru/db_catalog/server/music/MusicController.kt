@@ -68,8 +68,8 @@ class MusicController(
             val userRating = userService.getUserMusicRating(userId, music.id)
 
             val top = musicTopService.findByMusicId(music.id).firstOrNull()
-            val topIdName = top?.let { ContentIdName(it.id, it.name) }
-            val topPosition = top?.let { musicTopService.findPositionInTop(it.id, music.id) }
+            val topIdName = top?.let { ContentIdName(it.id!!, it.name) }
+            val topPosition = top?.let { musicTopService.findPositionInTop(it.id!!, music.id) }
 
             return ResponseEntity(
                 MusicForAnswer(

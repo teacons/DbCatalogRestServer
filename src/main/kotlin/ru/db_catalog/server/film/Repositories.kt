@@ -42,6 +42,8 @@ interface FilmRepository : CrudRepository<Film, Long> {
     @Query("select id from film where duration between :duration and :duration2")
     fun findAllByDuration(duration: Int, duration2: Int): Set<Long>
 
+    fun findFirstByName(name: String): Film?
+
 }
 
 @Repository
