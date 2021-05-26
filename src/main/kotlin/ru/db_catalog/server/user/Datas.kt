@@ -54,7 +54,5 @@ data class UserViewedFilmRef(val filmId: Long, var rating: Int?, val time: Times
 @Table("user_viewed_music")
 data class UserViewedMusicRef(val musicId: Long, var rating: Int?, val time: Timestamp)
 
-data class UserRegisterAnswerAndChange(val code: Long)
-
 @Table("user_role")
 data class RoleEntity(@Id val id: Long, val name: String)

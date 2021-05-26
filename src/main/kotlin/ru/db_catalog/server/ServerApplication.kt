@@ -6,6 +6,7 @@ import io.jsonwebtoken.lang.Strings.hasText
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletRequest
 
 
 @SpringBootApplication
+@EnableCaching
 class ServerApplication
 
 fun main(args: Array<String>) {
@@ -110,11 +112,11 @@ class JwtProvider {
 }
 
 
-class CustomUserDetails(user: User, roleEntity: RoleEntity) : UserDetails {
+class CustomUserDetails(user: User, roles: Set<RoleEntity>) : UserDetails {
 
     private val username: String = user.username
     private val password: String = user.password
-    private val grantedAuthorities: Collection<GrantedAuthority> = listOf(SimpleGrantedAuthority(roleEntity.name))
+    private val grantedAuthorities: Collection<GrantedAuthority> = roles.map { SimpleGrantedAuthority(it.name) }
 
     override fun getAuthorities(): Collection<GrantedAuthority> = grantedAuthorities
 
@@ -136,7 +138,13 @@ class CustomUserDetailsService(val userService: UserService, val roleService: Ro
 
     override fun loadUserByUsername(username: String): CustomUserDetails? {
         val user = userService.findByUsername(username)
-        return user?.let { CustomUserDetails(it, roleService.findById(user.role).get()) }
+        val role = if (user != null) {
+            if (user.role == 2L)
+                setOf(roleService.findById(user.role).get(), roleService.findById(1).get())
+            else
+                setOf(roleService.findById(user.role).get())
+        } else emptySet()
+        return user?.let { CustomUserDetails(it, role) }
     }
 }
 

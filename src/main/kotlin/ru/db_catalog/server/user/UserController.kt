@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.db_catalog.server.AuthResponse
 import ru.db_catalog.server.JwtProvider
+import ru.db_catalog.server.ErrorCode
 import java.sql.Timestamp
 import java.util.*
 
@@ -36,30 +37,30 @@ class UserController(
         password: String,
         @RequestParam(value = "email", required = true)
         email: String
-    ): UserRegisterAnswerAndChange {
+    ): ErrorCode {
         when {
             userService.existsUserByUsername(username) -> {
-                return UserRegisterAnswerAndChange(1)
+                return ErrorCode(1)
             }
             username.length > 20 -> {
-                return UserRegisterAnswerAndChange(2)
+                return ErrorCode(2)
             }
             userService.existsUserByEmail(email) -> {
-                return UserRegisterAnswerAndChange(3)
+                return ErrorCode(3)
             }
             password.length > 32 -> {
-                return UserRegisterAnswerAndChange(4)
+                return ErrorCode(4)
             }
             password.length < 6 -> {
-                return UserRegisterAnswerAndChange(5)
+                return ErrorCode(5)
             }
             else -> {
                 return try {
                     val user = User(null, username, password, email, Timestamp(Calendar.getInstance().timeInMillis), 1)
                     userService.saveWithEncrypt(user)
-                    UserRegisterAnswerAndChange(0)
+                    ErrorCode(0)
                 } catch (e: Exception) {
-                    UserRegisterAnswerAndChange(666)
+                    ErrorCode(666)
                 }
             }
         }
@@ -84,17 +85,17 @@ class UserController(
 
         when {
             userService.existsUserByUsername(newUserName) ->
-                return ResponseEntity(UserRegisterAnswerAndChange(1), HttpStatus.BAD_REQUEST)
+                return ResponseEntity(ErrorCode(1), HttpStatus.BAD_REQUEST)
 
             newUserName.length > 20 ->
-                return ResponseEntity(UserRegisterAnswerAndChange(2), HttpStatus.BAD_REQUEST)
+                return ResponseEntity(ErrorCode(2), HttpStatus.BAD_REQUEST)
 
             else -> {
                 user.username = newUserName
                 userService.save(user)
             }
         }
-        return ResponseEntity(UserRegisterAnswerAndChange(0), HttpStatus.OK)
+        return ResponseEntity(ErrorCode(0), HttpStatus.OK)
     }
 
     @PostMapping("/update/password")
@@ -105,21 +106,21 @@ class UserController(
     ): ResponseEntity<Any> {
         val username = jwtProvider.getLoginFromToken(token.substring(7))
         val user = userService.findByUsernameAndPassword(username, oldPassword)
-            ?: return ResponseEntity(UserRegisterAnswerAndChange(6), HttpStatus.BAD_REQUEST)
+            ?: return ResponseEntity(ErrorCode(6), HttpStatus.BAD_REQUEST)
 
         when {
             newPassword.length > 32 -> {
-                return ResponseEntity(UserRegisterAnswerAndChange(4), HttpStatus.BAD_REQUEST)
+                return ResponseEntity(ErrorCode(4), HttpStatus.BAD_REQUEST)
             }
             newPassword.length < 6 -> {
-                return ResponseEntity(UserRegisterAnswerAndChange(5), HttpStatus.BAD_REQUEST)
+                return ResponseEntity(ErrorCode(5), HttpStatus.BAD_REQUEST)
             }
             else -> {
                 user.password = newPassword
                 userService.saveWithEncrypt(user)
             }
         }
-        return ResponseEntity(UserRegisterAnswerAndChange(0), HttpStatus.OK)
+        return ResponseEntity(ErrorCode(0), HttpStatus.OK)
     }
 
     @PostMapping("/update/email")
@@ -132,14 +133,14 @@ class UserController(
 
         when {
             userService.existsUserByEmail(newEmail) -> {
-                return ResponseEntity(UserRegisterAnswerAndChange(3), HttpStatus.BAD_REQUEST)
+                return ResponseEntity(ErrorCode(3), HttpStatus.BAD_REQUEST)
             }
             else -> {
                 user.email = newEmail
                 userService.save(user)
             }
         }
-        return ResponseEntity(UserRegisterAnswerAndChange(0), HttpStatus.OK)
+        return ResponseEntity(ErrorCode(0), HttpStatus.OK)
     }
 
 

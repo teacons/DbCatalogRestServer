@@ -1,11 +1,14 @@
 package ru.db_catalog.server.moderate
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import ru.db_catalog.server.ErrorCode
 import ru.db_catalog.server.book.*
 import ru.db_catalog.server.film.*
 import ru.db_catalog.server.music.*
@@ -71,11 +74,11 @@ class ModeratorController(
             genresRefs.add(BookGenreRef(it.id))
         }
 
-        var book = Book(null, name, year, description, poster, bookSeriesId, genresRefs, authorsRefs)
+        val book = Book(null, name, year, description, poster, bookSeriesId, genresRefs, authorsRefs)
 
-        book = bookService.saveBook(book)
+        bookService.saveBook(book)
 
-        return ResponseEntity(book.id, HttpStatus.OK)
+        return ResponseEntity(ErrorCode(0), HttpStatus.OK)
 
     }
 
@@ -128,13 +131,13 @@ class ModeratorController(
         genres.forEach {
             genresRefs.add(MusicGenreRef(it.id))
         }
-        var music = if (albumId != null)
+        val music = if (albumId != null)
             Music(null, name, year, duration, genresRefs, artistsRefs, setOf(MusicAlbumRef(albumId)))
         else
             Music(null, name, year, duration, genresRefs, artistsRefs, emptySet())
-        music = musicService.saveMusic(music)
+        musicService.saveMusic(music)
 
-        return ResponseEntity(music.id, HttpStatus.OK)
+        return ResponseEntity(ErrorCode(0), HttpStatus.OK)
 
     }
 
@@ -148,9 +151,12 @@ class ModeratorController(
         @RequestParam(value = "film_series", required = false) filmSeriesFrom: String?,
         @RequestParam(value = "book", required = false) bookFrom: String?,
         @RequestParam(value = "music", required = false) musicFrom: String?,
-        @RequestParam(value = "peoples", required = true) peoplesFrom: Map<String, Long>,
+        @RequestParam(value = "peoples", required = true) peoplesFrom: String,
         @RequestParam(value = "genres", required = true) genresFrom: Set<Long>
     ): ResponseEntity<Any> {
+
+        val peoplesMap = ObjectMapper().readValue(peoplesFrom, object : TypeReference<Map<String, Long>>() {})
+
 
         val filmSeriesId = if (filmSeriesFrom != null) {
             var filmSeries = filmService.findFilmSeriesByName(filmSeriesFrom)
@@ -164,11 +170,11 @@ class ModeratorController(
             filmSeries.id
         } else null
 
-        val peoples = peopleService.findAllByFullnameIn(peoplesFrom.map { it.key }.toSet()).toMutableSet()
+        val peoples = peopleService.findAllByFullnameIn(peoplesMap.map { it.key }.toSet()).toMutableSet()
 
-        if (peoples.size != peoplesFrom.size) {
+        if (peoples.size != peoplesMap.size) {
             val diff = mutableSetOf<String>()
-            peoplesFrom.keys.forEach { s ->
+            peoplesMap.keys.forEach { s ->
                 if (s !in peoples.map { it.fullname }) diff.add(s)
             }
 
@@ -180,7 +186,7 @@ class ModeratorController(
         val peoplesRefs = mutableSetOf<FilmPeopleRef>()
 
         peoples.forEach {
-            it.id?.let { id -> peoplesRefs.add(FilmPeopleRef(id, peoplesFrom[it.fullname]!!)) }
+            it.id?.let { id -> peoplesRefs.add(FilmPeopleRef(id, peoplesMap[it.fullname]!!)) }
         }
 
         val genres = filmService.findFilmGenresByIds(genresFrom)
@@ -192,6 +198,7 @@ class ModeratorController(
         }
 
         val book = bookFrom?.let { bookService.findBookByName(it) }
+            ?: return ResponseEntity(ErrorCode(10), HttpStatus.OK)
 
         val musics = mutableSetOf<FilmMusicRef>()
 
@@ -201,14 +208,27 @@ class ModeratorController(
 
         if (musicFrom != null) {
             musicService.findMusicByName(musicFrom)?.let { musics.add(FilmMusicRef(it.id!!)) }
+            if (musics.isEmpty()) return ResponseEntity(ErrorCode(11), HttpStatus.OK)
         }
 
-        var film =
-            Film(null, name, year, duration, description, poster, filmSeriesId, book, genresRefs, peoplesRefs, musics.toSet())
+        val film =
+            Film(
+                null,
+                name,
+                year,
+                duration,
+                description,
+                poster,
+                filmSeriesId,
+                book.id,
+                genresRefs,
+                peoplesRefs,
+                musics.toSet()
+            )
 
-        film = filmService.saveFilm(film)
+        filmService.saveFilm(film)
 
-        return ResponseEntity(film.id, HttpStatus.OK)
+        return ResponseEntity(ErrorCode(0), HttpStatus.OK)
 
     }
 

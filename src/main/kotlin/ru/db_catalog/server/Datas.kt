@@ -17,3 +17,5 @@ data class AuthResponse(val token: String?, val role: Long?)
 enum class ContentType {
     BOOK, FILM, MUSIC
 }
+
+data class ErrorCode(val code: Long)

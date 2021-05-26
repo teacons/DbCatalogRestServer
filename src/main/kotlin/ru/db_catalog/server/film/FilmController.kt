@@ -71,8 +71,8 @@ class FilmController(
                 ContentIdName(filmSeries.id!!, filmSeries.name)
             } else null
 
-            val book = film.book?.let {
-                val bookTemp = bookService.findBookById(it.id!!).get()
+            val book = film.bookId?.let {
+                val bookTemp = bookService.findBookById(it).get()
                 ContentIdName(bookTemp.id!!, bookTemp.name)
             }
 

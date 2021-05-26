@@ -4,7 +4,6 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import ru.db_catalog.server.ContentIdName
-import ru.db_catalog.server.book.Book
 import ru.db_catalog.server.people.PeopleWithFunction
 
 @Table("film")
@@ -16,8 +15,7 @@ data class Film(
     val description: String,
     val poster: String?,
     val filmSeriesId: Long?,
-    @MappedCollection(idColumn = "id")
-    val book: Book?,
+    val bookId: Long?,
     @MappedCollection(idColumn = "film_id")
     val filmGenres: Set<FilmGenreRef>,
     @MappedCollection(idColumn = "film_id")
