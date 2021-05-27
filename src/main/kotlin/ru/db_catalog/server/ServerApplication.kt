@@ -1,12 +1,18 @@
 package ru.db_catalog.server
 
+import com.google.common.cache.CacheBuilder
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.lang.Strings.hasText
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.cache.Cache
+import org.springframework.cache.CacheManager
+import org.springframework.cache.annotation.CachingConfigurerSupport
 import org.springframework.cache.annotation.EnableCaching
+import org.springframework.cache.concurrent.ConcurrentMapCache
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -29,6 +35,7 @@ import ru.db_catalog.server.user.UserService
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
@@ -36,8 +43,27 @@ import javax.servlet.http.HttpServletRequest
 
 
 @SpringBootApplication
-@EnableCaching
 class ServerApplication
+
+@Configuration
+@EnableCaching
+class CacheConfiguration : CachingConfigurerSupport() {
+
+    override fun cacheManager(): CacheManager? {
+        return object : ConcurrentMapCacheManager() {
+            override fun createConcurrentMapCache(name: String): Cache {
+                return ConcurrentMapCache(
+                    name,
+                    CacheBuilder.newBuilder()
+                        .expireAfterWrite(30, TimeUnit.SECONDS)
+                        .build<Any, Any>().asMap(),
+                    false
+                )
+            }
+        }
+    }
+
+}
 
 fun main(args: Array<String>) {
     runApplication<ServerApplication>(*args)

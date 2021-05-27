@@ -26,7 +26,7 @@ class FilmFilterController(
         @RequestParam(value = "rating_up", required = true) ratingUp: Int,
     ): ResponseEntity<Any> {
 
-        val filmByYears = filmService.getFilmsByYears(Pair(yearDown, yearUp))
+        val filmByYears = filmService.getFilmsBetweenYears(Pair(yearDown, yearUp))
 
         val filmByRating = filmService.findFilmsByRatings(Pair(ratingDown, ratingUp))
 

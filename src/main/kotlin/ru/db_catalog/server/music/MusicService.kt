@@ -1,5 +1,6 @@
 package ru.db_catalog.server.music
 
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import ru.db_catalog.server.ContentIdName
 import java.util.*
@@ -12,24 +13,34 @@ class MusicService(
     val musicAlbumRepository: MusicAlbumRepository,
 ) {
 
+    @Cacheable("musicById", key = "#id")
     fun findMusicById(id: Long): Optional<Music> = musicRepository.findById(id)
 
+    @Cacheable("allMusicIdName")
     fun findAllMusicIdName(): Set<ContentIdName> = musicRepository.findAllIdName()
 
+    @Cacheable("musicRating", key = "#id")
     fun getMusicRating(id: Long): Double? = musicRepository.getRating(id)
 
+    @Cacheable("allArtists")
     fun findAllArtists(): MutableIterable<Artist> = artistRepository.findAll()
 
+    @Cacheable("artistById", key = "#id")
     fun findArtistById(id: Long): Optional<Artist> = artistRepository.findById(id)
 
+    @Cacheable("allMusicGenres")
     fun findAllMusicGenres(): MutableIterable<MusicGenre> = musicGenreRepository.findAll()
 
+    @Cacheable("musicGenreById", key = "#id")
     fun findMusicGenreById(id: Long): Optional<MusicGenre> = musicGenreRepository.findById(id)
 
+    @Cacheable("existsMusicGenreById", key = "#id")
     fun existsMusicGenreById(id: Long) = musicGenreRepository.existsById(id)
 
+    @Cacheable("musicAlbumById", key = "#id")
     fun findMusicAlbumById(id: Long): Optional<MusicAlbum> = musicAlbumRepository.findById(id)
 
+    @Cacheable("existsMusicGenreByName", key = "#name")
     fun findMusicAlbumByName(name: String) = musicAlbumRepository.findFirstByName(name)
 
     fun saveMusicAlbum(musicAlbum: MusicAlbum) = musicAlbumRepository.save(musicAlbum)
@@ -57,6 +68,7 @@ class MusicService(
 
     fun findAllArtistsByIdInContentIdName(ids: Set<Long>) = artistRepository.findAllByIdInContentIdName(ids)
 
+    @Cacheable("musicByName", key = "#name")
     fun findMusicByName(name: String) = musicRepository.findByName(name)
 
 }
