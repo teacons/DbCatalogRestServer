@@ -87,23 +87,23 @@ class UserUpdateMediaController(
     @PostMapping("/genre")
     fun updateGenre(
         @RequestHeader("Authorization") token: String,
-        @RequestParam("book_genres") book_genres: Set<Long>,
-        @RequestParam("film_genres") film_genres: Set<Long>,
-        @RequestParam("music_genres") music_genres: Set<Long>,
+        @RequestParam("book_genres", required = false) book_genres: Set<Long>?,
+        @RequestParam("film_genres", required = false) film_genres: Set<Long>?,
+        @RequestParam("music_genres", required = false) music_genres: Set<Long>?,
     ): ResponseEntity<Any> {
         val username = jwtProvider.getLoginFromToken(token.substring(7))
         val user = userService.findByUsername(username) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
 
         user.likedBookGenres.clear()
-        book_genres.forEach {
+        book_genres?.forEach {
             if (bookGenreService.existsBookGenreById(it)) user.likedBookGenres.add(UserBookGenreRef(it))
-            user.likedFilmGenres.clear()
         }
-        film_genres.forEach {
+        user.likedFilmGenres.clear()
+        film_genres?.forEach {
             if (filmGenreService.existsFilmGenreById(it)) user.likedFilmGenres.add(UserFilmGenreRef(it))
         }
         user.likedMusicGenres.clear()
-        music_genres.forEach {
+        music_genres?.forEach {
             if (musicGenreService.existsMusicGenreById(it)) user.likedMusicGenres.add(UserMusicGenreRef(it))
         }
 

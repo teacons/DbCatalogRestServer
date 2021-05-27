@@ -49,17 +49,17 @@ class UserMediaGetterController(
         when (type) {
             "book" -> {
                 val setOfViewed = user.viewedBook.map { it.bookId }.toSet()
-                return if (setOfViewed.isEmpty()) ResponseEntity(HttpStatus.OK)
+                return if (setOfViewed.isEmpty()) ResponseEntity(null, HttpStatus.OK)
                 else ResponseEntity(userService.getBookNamesByIds(setOfViewed), HttpStatus.OK)
             }
             "film" -> {
                 val setOfViewed = user.viewedFilm.map { it.filmId }.toSet()
-                return if (setOfViewed.isEmpty()) ResponseEntity(HttpStatus.OK)
+                return if (setOfViewed.isEmpty()) ResponseEntity(null, HttpStatus.OK)
                 else ResponseEntity(userService.getFilmNamesByIds(setOfViewed), HttpStatus.OK)
             }
             "music" -> {
                 val setOfViewed = user.viewedMusic.map { it.musicId }.toSet()
-                return if (setOfViewed.isEmpty()) ResponseEntity(HttpStatus.OK)
+                return if (setOfViewed.isEmpty()) ResponseEntity(null, HttpStatus.OK)
                 else ResponseEntity(userService.getMusicNamesByIds(setOfViewed), HttpStatus.OK)
             }
             else -> return ResponseEntity(HttpStatus.BAD_REQUEST)

@@ -12,7 +12,6 @@ import ru.db_catalog.server.music.*
 import ru.db_catalog.server.people.People
 import ru.db_catalog.server.people.PeopleService
 import ru.db_catalog.server.top.*
-import javax.xml.transform.OutputKeys
 
 @RestController
 @RequestMapping("/api/moderate")
