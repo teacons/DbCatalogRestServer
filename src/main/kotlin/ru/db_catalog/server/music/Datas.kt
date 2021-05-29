@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import ru.db_catalog.server.ContentIdName
+import java.util.*
 
 @Table("music")
 data class Music(
@@ -57,3 +58,26 @@ data class MusicForAnswer(
     val top: ContentIdName?,
     val topPosition: Int?
 )
+
+data class MusicFilter(
+    val genres: Set<Long>?,
+    val artists: Set<Long>?,
+    val duration: Pair<Int, Int>,
+    val years: Pair<Int, Int>,
+    val ratings: Pair<Int, Int>
+) {
+    fun getUUID(): String {
+        val genresString = genres?.joinToString()
+        val artistsString = artists?.joinToString()
+        val durationString = "${duration.first} - ${duration.second}"
+        val yearsString = "${years.first} - ${years.second}"
+        val ratingsString = "${ratings.first} - ${ratings.second}"
+
+        val string =
+            "${genresString}_${artistsString}_${durationString}_${yearsString}_${ratingsString}"
+
+        val uuid = UUID.nameUUIDFromBytes(string.toByteArray())
+
+        return uuid.toString()
+    }
+}

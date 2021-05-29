@@ -19,8 +19,8 @@ interface BookRepository : CrudRepository<Book, Long> {
     @Query("select round(avg(rating), 2) from user_viewed_book where book_id = :id")
     fun getRating(@Param("id") id: Long): Double?
 
-    @Query("select id, name from book")
-    fun findAllIdName(): Set<ContentIdName>
+    @Query("select id from book")
+    fun findAllId(): Set<Long>
 
     @Query("select id, name from book where id in (:ids)")
     fun findIdNameByIds(@Param("ids") ids: Set<Long>): Set<ContentIdName>
@@ -38,6 +38,9 @@ interface BookRepository : CrudRepository<Book, Long> {
     fun findAllByGenres(@Param("genres") genres: Set<Long>): Set<Long>
 
     fun findFirstByName(name: String): Book?
+
+    @Query("select id from book where lower(book.name) like :name")
+    fun findIdAllByNameLikeIgnoreCase(name: String) : Set<Long>
 
 }
 

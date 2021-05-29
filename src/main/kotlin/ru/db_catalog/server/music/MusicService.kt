@@ -1,8 +1,13 @@
 package ru.db_catalog.server.music
 
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import ru.db_catalog.server.Content
 import ru.db_catalog.server.ContentIdName
+import ru.db_catalog.server.top.MusicTopService
+import ru.db_catalog.server.user.UserService
 import java.util.*
 
 @Service
@@ -11,15 +16,16 @@ class MusicService(
     val artistRepository: ArtistRepository,
     val musicGenreRepository: MusicGenreRepository,
     val musicAlbumRepository: MusicAlbumRepository,
+    val userService: UserService,
+    val musicTopService: MusicTopService
 ) {
 
     @Cacheable("musicById", key = "#id")
     fun findMusicById(id: Long): Optional<Music> = musicRepository.findById(id)
 
     @Cacheable("allMusicIdName")
-    fun findAllMusicIdName(): Set<ContentIdName> = musicRepository.findAllIdName()
+    fun findAllMusicIds(): Set<Long> = musicRepository.findAllId()
 
-    @Cacheable("musicRating", key = "#id")
     fun getMusicRating(id: Long): Double? = musicRepository.getRating(id)
 
     @Cacheable("allArtists")
@@ -40,7 +46,6 @@ class MusicService(
     @Cacheable("musicAlbumById", key = "#id")
     fun findMusicAlbumById(id: Long): Optional<MusicAlbum> = musicAlbumRepository.findById(id)
 
-    @Cacheable("existsMusicGenreByName", key = "#name")
     fun findMusicAlbumByName(name: String) = musicAlbumRepository.findFirstByName(name)
 
     fun saveMusicAlbum(musicAlbum: MusicAlbum) = musicAlbumRepository.save(musicAlbum)
@@ -58,19 +63,103 @@ class MusicService(
 
     fun findAllByRatings(ratings: Pair<Int, Int>) = musicRepository.findAllByRatings(ratings.first, ratings.second)
 
-    fun findAllByDuration(duration: Int, duration2: Int) = musicRepository.findAllByDuration(duration, duration2)
+    fun findAllByDuration(duration: Pair<Int, Int>) = musicRepository.findAllByDuration(duration.first, duration.second)
 
     fun findAllByGenres(genres: Set<Long>) = musicRepository.findAllByGenres(genres)
 
     fun findAllByArtists(artists: Set<Long>) = musicRepository.findAllByArtists(artists)
 
-    fun findMusicIdNameByIds(ids: Set<Long>): Set<ContentIdName> = musicRepository.findIdNameByIds(ids)
-
     fun findAllArtistsByIdInContentIdName(ids: Set<Long>) = artistRepository.findAllByIdInContentIdName(ids)
 
-    @Cacheable("musicByName", key = "#name")
     fun findMusicByName(name: String) = musicRepository.findByName(name)
 
+    @Cacheable("musicsByName", key = "#name")
+    fun findAllMusicsByName(name: String) = musicRepository.findIdAllByNameLikeIgnoreCase(name)
+
+    @Cacheable("filterMusic", key = "#filterMusic.getUUID()")
+    fun filterMusic(filterMusic: MusicFilter): Set<Long> {
+        val musicByYears = getMusicByYears(filterMusic.years)
+
+        val musicByRating = findAllByRatings(filterMusic.ratings)
+
+        val musicByDuration = findAllByDuration(filterMusic.duration)
+
+        val musicByArtists = if (filterMusic.artists != null) findAllByArtists(filterMusic.artists) else null
+
+        val musicByGenres = if (filterMusic.genres != null) findAllByGenres(filterMusic.genres) else null
+
+        var intersected = musicByRating.intersect(musicByYears).intersect(musicByDuration)
+
+        if (musicByArtists != null) intersected = intersected.intersect(musicByArtists)
+
+        if (musicByGenres != null) intersected = intersected.intersect(musicByGenres)
+
+        return intersected
+    }
+
+    fun prepareMusic(music: Music, expanded: Boolean, username: String): ResponseEntity<Any> {
+
+        val userId = userService.findByUsername(username)?.id
+
+        var rating = getMusicRating(music.id!!)
+
+        if (rating == null) rating = 0.0
+
+        val genres = mutableSetOf<String>()
+
+        music.musicGenres.forEach {
+            genres.add(findMusicGenreById(it.musicGenreId).get().name)
+        }
+
+        val poster =
+            music.albums.firstOrNull()?.let { findMusicAlbumById(it.musicAlbumId).get().poster }
+        if (!expanded) {
+            return ResponseEntity(
+                Content(music.id, music.name, music.year, poster, rating, genres),
+                HttpStatus.OK
+            )
+        } else {
+            if (userId == null) return ResponseEntity(HttpStatus.BAD_REQUEST)
+
+            val albums = mutableSetOf<MusicAlbum>()
+
+            music.albums.forEach {
+                albums.add(findMusicAlbumById(it.musicAlbumId).get())
+            }
+
+            val artists = mutableSetOf<Artist>()
+
+            music.artists.forEach {
+                artists.add(findArtistById(it.artistId).get())
+            }
+
+            val viewed = userService.existsViewByUserIdMusicId(userId, music.id)
+
+            val userRating = userService.getUserMusicRating(userId, music.id)
+
+            val top = musicTopService.findByMusicId(music.id).firstOrNull()
+            val topIdName = top?.let { ContentIdName(it.id!!, it.name) }
+            val topPosition = top?.let { musicTopService.findPositionInTop(it.id!!, music.id) }
+
+            return ResponseEntity(
+                MusicForAnswer(
+                    music.id,
+                    music.name,
+                    music.year,
+                    music.duration,
+                    poster,
+                    rating,
+                    artists,
+                    albums,
+                    genres,
+                    viewed,
+                    userRating,
+                    topIdName,
+                    topPosition
+                ), HttpStatus.OK
+            )
+        }
+    }
 }
 
 

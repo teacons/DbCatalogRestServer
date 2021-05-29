@@ -197,9 +197,9 @@ class ModeratorController(
         genres.forEach {
             genresRefs.add(FilmGenreRef(it.id))
         }
-
-        val book = bookFrom?.let { bookService.findBookByName(it) }
-            ?: return ResponseEntity(ErrorCode(10), HttpStatus.OK)
+        val book = if (bookFrom != null) {
+            bookService.findBookByName(bookFrom) ?: return ResponseEntity(ErrorCode(10), HttpStatus.OK)
+        } else null
 
         val musics = mutableSetOf<FilmMusicRef>()
 
@@ -221,7 +221,7 @@ class ModeratorController(
                 description,
                 poster,
                 filmSeriesId,
-                book.id,
+                book?.id,
                 genresRefs,
                 peoplesRefs,
                 musics.toSet()
@@ -246,8 +246,9 @@ class ModeratorController(
 
             "book" -> {
                 val topRefs = mutableSetOf<BookTopRef>()
-                contents.forEach{
-                    val book = bookService.findBookByName(it.value) ?: return ResponseEntity(ErrorCode(12), HttpStatus.OK)
+                contents.forEach {
+                    val book =
+                        bookService.findBookByName(it.value) ?: return ResponseEntity(ErrorCode(21), HttpStatus.OK)
                     topRefs.add(BookTopRef(book.id!!, it.key))
                 }
 
@@ -256,8 +257,9 @@ class ModeratorController(
 
             "film" -> {
                 val topRefs = mutableSetOf<FilmTopRef>()
-                contents.forEach{
-                    val film = filmService.findFilmByName(it.value) ?: return ResponseEntity(ErrorCode(13), HttpStatus.OK)
+                contents.forEach {
+                    val film =
+                        filmService.findFilmByName(it.value) ?: return ResponseEntity(ErrorCode(22), HttpStatus.OK)
                     topRefs.add(FilmTopRef(film.id!!, it.key))
                 }
 
@@ -266,8 +268,9 @@ class ModeratorController(
 
             "music" -> {
                 val topRefs = mutableSetOf<MusicTopRef>()
-                contents.forEach{
-                    val music = musicService.findMusicByName(it.value) ?: return ResponseEntity(ErrorCode(14), HttpStatus.OK)
+                contents.forEach {
+                    val music =
+                        musicService.findMusicByName(it.value) ?: return ResponseEntity(ErrorCode(23), HttpStatus.OK)
                     topRefs.add(MusicTopRef(music.id!!, it.key))
                 }
 

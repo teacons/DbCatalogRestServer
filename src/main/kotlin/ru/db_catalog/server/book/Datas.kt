@@ -5,6 +5,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import ru.db_catalog.server.ContentIdName
 import ru.db_catalog.server.people.People
+import java.util.*
 
 @Table("book_genre")
 data class BookGenre(@Id val id: Long, val name: String, val description: String)
@@ -51,3 +52,23 @@ data class BookForAnswer(
     val top: ContentIdName?,
     val topPosition: Int?
 )
+
+data class FilterBook(
+    val genres: Set<Long>?,
+    val authors: Set<Long>?,
+    val years: Pair<Int, Int>,
+    val ratings: Pair<Int, Int>
+) {
+    fun getUUID(): String {
+        val genresString = genres?.joinToString()
+        val authorsString = authors?.joinToString()
+        val yearsString = "${years.first} - ${years.second}"
+        val ratingsString = "${ratings.first} - ${ratings.second}"
+
+        val string = "${genresString}_${authorsString}_${yearsString}_${ratingsString}"
+
+        val uuid = UUID.nameUUIDFromBytes(string.toByteArray())
+
+        return uuid.toString()
+    }
+}

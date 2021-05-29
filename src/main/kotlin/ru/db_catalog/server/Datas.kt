@@ -19,3 +19,18 @@ enum class ContentType {
 }
 
 data class ErrorCode(val code: Long)
+
+fun getSlice(
+    id: Long?,
+    ids: List<Long>,
+    size: Int
+): List<Long> {
+    return if (id != null) {
+        val fromId = ids.indexOf(id)
+        val toId = if (fromId + 1 + size <= ids.size) fromId + 1 + size else ids.size
+        ids.subList(fromId + 1, toId)
+    } else {
+        val toId = if (size <= ids.size) size else ids.size
+        ids.subList(0, toId)
+    }
+}

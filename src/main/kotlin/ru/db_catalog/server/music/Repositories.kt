@@ -19,8 +19,8 @@ interface MusicRepository : CrudRepository<Music, Long> {
     @Query("select round(avg(rating), 2) from user_viewed_music where music_id = :id")
     fun getRating(@Param("id") id: Long): Double?
 
-    @Query("select id, name from music")
-    fun findAllIdName(): Set<ContentIdName>
+    @Query("select id from music")
+    fun findAllId(): Set<Long>
 
     @Query("select id, name from music where id in (:ids)")
     fun findIdNameByIds(ids: Set<Long>): Set<ContentIdName>
@@ -41,6 +41,9 @@ interface MusicRepository : CrudRepository<Music, Long> {
     fun findAllByDuration(duration: Int, duration2: Int): Set<Long>
 
     fun findByName(name: String): Music?
+
+    @Query("select id from music where lower(music.name) like :name")
+    fun findIdAllByNameLikeIgnoreCase(name: String) : Set<Long>
 
 }
 

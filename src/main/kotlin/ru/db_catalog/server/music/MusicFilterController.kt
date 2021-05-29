@@ -1,19 +1,18 @@
 package ru.db_catalog.server.music
 
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import ru.db_catalog.server.getSlice
 
 @RestController
-@RequestMapping("/api/music/filter")
+@RequestMapping("/api/music")
 class MusicFilterController(
     val musicService: MusicService
 ) {
 
-    @GetMapping
+    @GetMapping("/filter")
     fun filterMusic(
         @RequestParam(value = "genres", required = false) genres: Set<Long>?,
         @RequestParam(value = "artists", required = false) artists: Set<Long>?,
@@ -23,26 +22,32 @@ class MusicFilterController(
         @RequestParam(value = "year_up", required = true) yearUp: Int,
         @RequestParam(value = "rating_down", required = true) ratingDown: Int,
         @RequestParam(value = "rating_up", required = true) ratingUp: Int,
-    ): ResponseEntity<Any> {
+        @RequestParam(value = "id", required = false) id: Long?,
+        @RequestParam(value = "size", required = true) size: Int
+    ): List<Long> {
 
-        val musicByYears = musicService.getMusicByYears(Pair(yearDown, yearUp))
+        val ids = musicService.filterMusic(
+            MusicFilter(
+                genres,
+                artists,
+                Pair(durationDown, durationUp),
+                Pair(yearDown, yearUp),
+                Pair(ratingDown, ratingUp)
+            )
+        ).sorted()
 
-        val musicByRating = musicService.findAllByRatings(Pair(ratingDown, ratingUp))
+        return getSlice(id, ids, size)
+    }
 
-        val musicByDuration = musicService.findAllByDuration(durationDown, durationUp)
+    @GetMapping("/search")
+    fun searchMusic(
+        @RequestParam(value = "query", required = true) query: String,
+        @RequestParam(value = "id", required = false) id: Long?,
+        @RequestParam(value = "size", required = true) size: Int
+    ): List<Long> {
+        val ids = musicService.findAllMusicsByName("%${query.toLowerCase()}%").sorted()
 
-        val musicByArtists = if (artists != null) musicService.findAllByArtists(artists) else null
-
-        val musicByGenres = if (genres != null) musicService.findAllByGenres(genres) else null
-
-        var intersected = musicByRating.intersect(musicByYears).intersect(musicByDuration)
-
-        if (musicByArtists != null) intersected = intersected.intersect(musicByArtists)
-
-        if (musicByGenres != null) intersected = intersected.intersect(musicByGenres)
-
-        return if (intersected.isEmpty()) ResponseEntity(HttpStatus.OK)
-        else ResponseEntity(musicService.findMusicIdNameByIds(intersected), HttpStatus.OK)
+        return getSlice(id, ids, size)
     }
 
 }

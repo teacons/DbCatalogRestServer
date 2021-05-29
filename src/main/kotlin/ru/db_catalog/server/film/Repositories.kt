@@ -18,8 +18,8 @@ interface FilmRepository : CrudRepository<Film, Long> {
     @Query("select round(avg(rating), 2) from user_viewed_film where film_id = :id")
     fun getRating(id: Long): Double?
 
-    @Query("select id, name from film")
-    fun findAllIdName(): Set<ContentIdName>
+    @Query("select id from film")
+    fun findAllId(): Set<Long>
 
     @Query("select id, name from film where id in (:ids)")
     fun findIdNameByIds(ids: Set<Long>): Set<ContentIdName>
@@ -43,6 +43,10 @@ interface FilmRepository : CrudRepository<Film, Long> {
     fun findAllByDuration(duration: Int, duration2: Int): Set<Long>
 
     fun findFirstByName(name: String): Film?
+
+    @Query("select id from film where lower(film.name) like :name")
+    fun findIdAllByNameLikeIgnoreCase(name: String) : Set<Long>
+
 
 }
 

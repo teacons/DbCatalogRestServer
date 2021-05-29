@@ -1,19 +1,18 @@
 package ru.db_catalog.server.film
 
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import ru.db_catalog.server.getSlice
 
 
 @RestController
-@RequestMapping("/api/film/filter")
+@RequestMapping("/api/film")
 class FilmFilterController(
     val filmService: FilmService
 ) {
-    @GetMapping
+    @GetMapping("/filter")
     fun filterFilm(
         @RequestParam(value = "genres", required = false) genres: Set<Long>?,
         @RequestParam(value = "actors", required = false) actors: Set<Long>?,
@@ -24,29 +23,32 @@ class FilmFilterController(
         @RequestParam(value = "year_up", required = true) yearUp: Int,
         @RequestParam(value = "rating_down", required = true) ratingDown: Int,
         @RequestParam(value = "rating_up", required = true) ratingUp: Int,
-    ): ResponseEntity<Any> {
+        @RequestParam(value = "id", required = false) id: Long?,
+        @RequestParam(value = "size", required = true) size: Int
+    ): List<Long> {
 
-        val filmByYears = filmService.getFilmsBetweenYears(Pair(yearDown, yearUp))
+        val ids = filmService.filterFilm(
+            FilterFilm(
+                genres,
+                actors,
+                creators,
+                Pair(durationDown, durationUp),
+                Pair(yearDown, yearUp),
+                Pair(ratingDown, ratingUp)
+            )
+        ).sorted()
 
-        val filmByRating = filmService.findFilmsByRatings(Pair(ratingDown, ratingUp))
+        return getSlice(id, ids, size)
+    }
 
-        val filmByDuration = filmService.findAllByDuration(durationDown, durationUp)
+    @GetMapping("/search")
+    fun searchFilm(
+        @RequestParam(value = "query", required = true) query: String,
+        @RequestParam(value = "id", required = false) id: Long?,
+        @RequestParam(value = "size", required = true) size: Int
+    ): List<Long> {
+        val ids = filmService.findAllFilmsByName("%${query.toLowerCase()}%").sorted()
 
-        val filmByActors = if (actors != null) filmService.findAllByActors(actors) else null
-
-        val filmByCreators = if (creators != null) filmService.findAllByCreators(creators) else null
-
-        val filmByGenres = if (genres != null) filmService.findAllByGenres(genres) else null
-
-        var intersected = filmByRating.intersect(filmByYears).intersect(filmByDuration)
-
-        if (filmByActors != null) intersected = intersected.intersect(filmByActors)
-
-        if (filmByCreators != null) intersected = intersected.intersect(filmByCreators)
-
-        if (filmByGenres != null) intersected = intersected.intersect(filmByGenres)
-
-        return if (intersected.isEmpty()) ResponseEntity(HttpStatus.OK)
-        else ResponseEntity(filmService.findFilmIdNameByIds(intersected), HttpStatus.OK)
+        return getSlice(id, ids, size)
     }
 }

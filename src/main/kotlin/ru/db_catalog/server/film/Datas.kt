@@ -5,6 +5,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import ru.db_catalog.server.ContentIdName
 import ru.db_catalog.server.people.PeopleWithFunction
+import java.util.*
 
 @Table("film")
 data class Film(
@@ -61,3 +62,28 @@ data class FilmForAnswer(
 
 @Table("film_genre")
 data class FilmGenre(@Id val id: Long, val name: String, val description: String)
+
+data class FilterFilm(
+    val genres: Set<Long>?,
+    val actors: Set<Long>?,
+    val creators: Set<Long>?,
+    val duration: Pair<Int, Int>,
+    val years: Pair<Int, Int>,
+    val ratings: Pair<Int, Int>
+) {
+    fun getUUID(): String {
+        val genresString = genres?.joinToString()
+        val actorsString = actors?.joinToString()
+        val creatorsString = creators?.joinToString()
+        val durationString = "${duration.first} - ${duration.second}"
+        val yearsString = "${years.first} - ${years.second}"
+        val ratingsString = "${ratings.first} - ${ratings.second}"
+
+        val string =
+            "${genresString}_${actorsString}_${creatorsString}_${durationString}_${yearsString}_${ratingsString}"
+
+        val uuid = UUID.nameUUIDFromBytes(string.toByteArray())
+
+        return uuid.toString()
+    }
+}

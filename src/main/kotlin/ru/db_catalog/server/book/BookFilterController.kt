@@ -1,19 +1,18 @@
 package ru.db_catalog.server.book
 
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import ru.db_catalog.server.getSlice
 
 @RestController
-@RequestMapping("/api/book/filter")
+@RequestMapping("/api/book")
 class BookFilterController(
     val bookService: BookService
 ) {
 
-    @GetMapping
+    @GetMapping("/filter")
     fun filterBook(
         @RequestParam(value = "genres", required = false) genres: Set<Long>?,
         @RequestParam(value = "authors", required = false) authors: Set<Long>?,
@@ -21,23 +20,27 @@ class BookFilterController(
         @RequestParam(value = "year_up", required = true) yearUp: Int,
         @RequestParam(value = "rating_down", required = true) ratingDown: Int,
         @RequestParam(value = "rating_up", required = true) ratingUp: Int,
-    ): ResponseEntity<Any> {
+        @RequestParam(value = "id", required = false) id: Long?,
+        @RequestParam(value = "size", required = true) size: Int
+    ): List<Long> {
 
-        val bookByYears = bookService.getBooksBetweenYears(Pair(yearDown, yearUp))
+        val ids =
+            bookService.filterBook(FilterBook(genres, authors, Pair(yearDown, yearUp), Pair(ratingDown, ratingUp)))
+                .sorted()
 
-        val bookByRating = bookService.findAllByRatings(Pair(ratingDown, ratingUp))
-
-        val bookByAuthors = if (authors != null) bookService.findAllByAuthors(authors) else null
-
-        val bookByGenres = if (genres != null) bookService.findAllByGenres(genres) else null
-
-        var intersected = bookByRating.intersect(bookByYears)
-
-        if (bookByAuthors != null) intersected = intersected.intersect(bookByAuthors)
-
-        if (bookByGenres != null) intersected = intersected.intersect(bookByGenres)
-
-        return if (intersected.isEmpty()) ResponseEntity(HttpStatus.OK)
-        else ResponseEntity(bookService.findBookIdNameByIds(intersected), HttpStatus.OK)
+        return getSlice(id, ids, size)
     }
+
+
+    @GetMapping("/search")
+    fun searchBook(
+        @RequestParam(value = "query", required = true) query: String,
+        @RequestParam(value = "id", required = false) id: Long?,
+        @RequestParam(value = "size", required = true) size: Int
+    ): List<Long> {
+        val ids = bookService.findAllBooksIdsByName("%${query.toLowerCase()}%").sorted()
+
+        return getSlice(id, ids, size)
+    }
+
 }

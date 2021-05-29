@@ -1,10 +1,7 @@
 package ru.db_catalog.server.top
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
-import ru.db_catalog.server.ContentIdName
+import org.springframework.web.bind.annotation.*
+import ru.db_catalog.server.getSlice
 import java.util.*
 
 @RestController
@@ -16,8 +13,12 @@ class TopController(
 ) {
 
     @GetMapping("/book")
-    fun getBookTops(): Set<ContentIdName> {
-        return bookTopService.findAllIdName()
+    fun getBookTops(
+        @RequestParam(value = "id", required = false) id: Long?,
+        @RequestParam(value = "size", required = true) size: Int
+    ): List<Long> {
+        val ids = bookTopService.findAllId().sorted()
+        return getSlice(id, ids, size)
 
     }
 
@@ -27,9 +28,12 @@ class TopController(
     }
 
     @GetMapping("/music")
-    fun getMusicTops(): Set<ContentIdName> {
-        return musicTopService.findAllIdName()
-
+    fun getMusicTops(
+        @RequestParam(value = "id", required = false) id: Long?,
+        @RequestParam(value = "size", required = true) size: Int
+    ): List<Long> {
+        val ids = musicTopService.findAllId().sorted()
+        return getSlice(id, ids, size)
     }
 
     @GetMapping("/music/{id}")
@@ -38,14 +42,33 @@ class TopController(
     }
 
     @GetMapping("/film")
-    fun getFilmTops(): Set<ContentIdName> {
-        return filmTopService.findAllIdName()
-
+    fun getFilmTops(
+        @RequestParam(value = "id", required = false) id: Long?,
+        @RequestParam(value = "size", required = true) size: Int
+    ): List<Long> {
+        val ids = filmTopService.findAllId().sorted()
+        return getSlice(id, ids, size)
     }
 
     @GetMapping("/film/{id}")
     fun getFilmTop(@PathVariable id: Long): Optional<FilmTop> {
         return filmTopService.findById(id)
+    }
+
+    @GetMapping("/{type}/search")
+    fun searchTop(
+        @PathVariable type: String,
+        @RequestParam(value = "query", required = true) query: String,
+        @RequestParam(value = "id", required = false) id: Long?,
+        @RequestParam(value = "size", required = true) size: Int
+    ): List<Long> {
+        val ids = when (type) {
+            "book" -> bookTopService.findAllMusicsByName("%${query.toLowerCase()}%")
+            "film" -> filmTopService.findAllMusicsByName("%${query.toLowerCase()}%")
+            "music" -> musicTopService.findAllMusicsByName("%${query.toLowerCase()}%")
+            else -> throw IllegalArgumentException("searchTop: bad type")
+        }.sorted()
+         return getSlice(id, ids, size)
     }
 
 }
