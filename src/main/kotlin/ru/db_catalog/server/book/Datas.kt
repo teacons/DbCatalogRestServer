@@ -57,7 +57,8 @@ data class FilterBook(
     val genres: Set<Long>?,
     val authors: Set<Long>?,
     val years: Pair<Int, Int>,
-    val ratings: Pair<Int, Int>
+    val ratings: Pair<Int, Int>,
+    val searchQuery: String?
 ) {
     fun getUUID(): String {
         val genresString = genres?.joinToString()
@@ -65,7 +66,7 @@ data class FilterBook(
         val yearsString = "${years.first} - ${years.second}"
         val ratingsString = "${ratings.first} - ${ratings.second}"
 
-        val string = "${genresString}_${authorsString}_${yearsString}_${ratingsString}"
+        val string = "${genresString}_${authorsString}_${yearsString}_${ratingsString}_${searchQuery}"
 
         val uuid = UUID.nameUUIDFromBytes(string.toByteArray())
 

@@ -84,6 +84,9 @@ class MusicService(
 
         val musicByDuration = findAllByDuration(filterMusic.duration)
 
+        val musicBySearchQuery =
+            if (filterMusic.searchQuery != null) findAllMusicsByName("%${filterMusic.searchQuery.toLowerCase()}%") else null
+
         val musicByArtists = if (filterMusic.artists != null) findAllByArtists(filterMusic.artists) else null
 
         val musicByGenres = if (filterMusic.genres != null) findAllByGenres(filterMusic.genres) else null
@@ -93,6 +96,8 @@ class MusicService(
         if (musicByArtists != null) intersected = intersected.intersect(musicByArtists)
 
         if (musicByGenres != null) intersected = intersected.intersect(musicByGenres)
+
+        if (musicBySearchQuery != null) intersected = intersected.intersect(musicBySearchQuery)
 
         return intersected
     }

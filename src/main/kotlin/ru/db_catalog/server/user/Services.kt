@@ -12,7 +12,8 @@ class UserService(
     val passwordEncoder: PasswordEncoder,
     val bookRepository: BookRepository,
     val filmRepository: FilmRepository,
-    val musicRepository: MusicRepository
+    val musicRepository: MusicRepository,
+    val roleRepository: UserRoleRepository
 ) {
 
     fun findByUsername(username: String) = userRepository.findByUsername(username)
@@ -59,17 +60,12 @@ class UserService(
 
     fun getMusicNamesByIds(ids: Set<Long>) = musicRepository.findIdNameByIds(ids)
 
-    fun getUserRecommendedBook(genres: Set<Long>) = userRepository.getUserRecommendedBook(genres)
+    fun getUserRecommendedBook(genres: Set<Long>): Set<Long> = userRepository.getUserRecommendedBook(genres)
 
-    fun getUserRecommendedFilm(genres: Set<Long>) = userRepository.getUserRecommendedFilm(genres)
+    fun getUserRecommendedFilm(genres: Set<Long>): Set<Long> = userRepository.getUserRecommendedFilm(genres)
 
-    fun getUserRecommendedMusic(genres: Set<Long>) = userRepository.getUserRecommendedMusic(genres)
+    fun getUserRecommendedMusic(genres: Set<Long>): Set<Long> = userRepository.getUserRecommendedMusic(genres)
 
-}
-
-@Service
-class RoleService(val db: UserRoleRepository) {
-
-    fun findById(id: Long) = db.findById(id)
+    fun findRoleById(id: Long) = roleRepository.findById(id)
 
 }

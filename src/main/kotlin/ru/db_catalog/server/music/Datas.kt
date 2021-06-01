@@ -64,7 +64,8 @@ data class MusicFilter(
     val artists: Set<Long>?,
     val duration: Pair<Int, Int>,
     val years: Pair<Int, Int>,
-    val ratings: Pair<Int, Int>
+    val ratings: Pair<Int, Int>,
+    val searchQuery: String?
 ) {
     fun getUUID(): String {
         val genresString = genres?.joinToString()
@@ -74,7 +75,7 @@ data class MusicFilter(
         val ratingsString = "${ratings.first} - ${ratings.second}"
 
         val string =
-            "${genresString}_${artistsString}_${durationString}_${yearsString}_${ratingsString}"
+            "${genresString}_${artistsString}_${durationString}_${yearsString}_${ratingsString}_${searchQuery}"
 
         val uuid = UUID.nameUUIDFromBytes(string.toByteArray())
 

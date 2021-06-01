@@ -16,12 +16,12 @@ class BookTopService(val db: BookTopRepository) {
     fun findPositionInTop(topId: Long, bookId: Long) = db.findPositionInTop(topId, bookId)
 
     @Cacheable("allBookTopIdName")
-    fun findAllId() = db.findAllId()
+    fun findAllIdName() = db.findAllIdName()
 
     fun saveTop(bookTop: BookTop) = db.save(bookTop)
 
     @Cacheable("bookTopByName", key = "#name")
-    fun findAllMusicsByName(name: String) = db.findIdAllByNameLikeIgnoreCase(name)
+    fun findAllBooksIdNameByName(name: String) = db.findIdNameAllByNameLikeIgnoreCase(name)
 
 }
 
@@ -37,12 +37,12 @@ class MusicTopService(val db: MusicTopRepository) {
     fun findPositionInTop(topId: Long, musicId: Long) = db.findPositionInTop(topId, musicId)
 
     @Cacheable("allMusicTopIdName")
-    fun findAllId() = db.findAllId()
+    fun findAllId() = db.findAllIdName()
 
     fun saveTop(musicTop: MusicTop) = db.save(musicTop)
 
     @Cacheable("musicTopByName", key = "#name")
-    fun findAllMusicsByName(name: String) = db.findIdAllByNameLikeIgnoreCase(name)
+    fun findAllMusicsIdNameByName(name: String) = db.findIdNameAllByNameLikeIgnoreCase(name)
 
 }
 
@@ -58,11 +58,11 @@ class FilmTopService(val db: FilmTopRepository) {
     fun findPositionInTop(topId: Long, filmId: Long) = db.findPositionInTop(topId, filmId)
 
     @Cacheable("allFilmTopIdName")
-    fun findAllId() = db.findAllId()
+    fun findAllIdName() = db.findAllIdName()
 
     fun saveTop(filmTop: FilmTop) = db.save(filmTop)
 
     @Cacheable("filmTopByName", key = "#name")
-    fun findAllMusicsByName(name: String) = db.findIdAllByNameLikeIgnoreCase(name)
+    fun findAllFilmsIdNameByName(name: String) = db.findIdNameAllByNameLikeIgnoreCase(name)
 
 }

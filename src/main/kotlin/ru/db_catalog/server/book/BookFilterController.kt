@@ -20,25 +20,14 @@ class BookFilterController(
         @RequestParam(value = "year_up", required = true) yearUp: Int,
         @RequestParam(value = "rating_down", required = true) ratingDown: Int,
         @RequestParam(value = "rating_up", required = true) ratingUp: Int,
+        @RequestParam(value = "query", required = false) searchQuery: String?,
         @RequestParam(value = "id", required = false) id: Long?,
         @RequestParam(value = "size", required = true) size: Int
     ): List<Long> {
 
         val ids =
-            bookService.filterBook(FilterBook(genres, authors, Pair(yearDown, yearUp), Pair(ratingDown, ratingUp)))
+            bookService.filterBook(FilterBook(genres, authors, Pair(yearDown, yearUp), Pair(ratingDown, ratingUp), searchQuery))
                 .sorted()
-
-        return getSlice(id, ids, size)
-    }
-
-
-    @GetMapping("/search")
-    fun searchBook(
-        @RequestParam(value = "query", required = true) query: String,
-        @RequestParam(value = "id", required = false) id: Long?,
-        @RequestParam(value = "size", required = true) size: Int
-    ): List<Long> {
-        val ids = bookService.findAllBooksIdsByName("%${query.toLowerCase()}%").sorted()
 
         return getSlice(id, ids, size)
     }

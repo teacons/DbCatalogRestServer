@@ -75,6 +75,9 @@ class BookService(
 
         val bookByRating = findAllByRatings(filterBook.ratings)
 
+        val bookBySearchQuery =
+            if (filterBook.searchQuery != null) findAllBooksIdsByName("%${filterBook.searchQuery.toLowerCase()}%") else null
+
         val bookByAuthors = if (filterBook.authors != null) findAllByAuthors(filterBook.authors) else null
 
         val bookByGenres = if (filterBook.genres != null) findAllByGenres(filterBook.genres) else null
@@ -84,6 +87,8 @@ class BookService(
         if (bookByAuthors != null) intersected = intersected.intersect(bookByAuthors)
 
         if (bookByGenres != null) intersected = intersected.intersect(bookByGenres)
+
+        if (bookBySearchQuery != null) intersected = intersected.intersect(bookBySearchQuery)
 
         return intersected
     }

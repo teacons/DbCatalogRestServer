@@ -87,6 +87,9 @@ class FilmService(
 
         val filmByDuration = findAllByDuration(filterFilm.duration)
 
+        val filmBySearchQuery =
+            if (filterFilm.searchQuery != null) findAllFilmsByName("%${filterFilm.searchQuery.toLowerCase()}%") else null
+
         val filmByActors = if (filterFilm.actors != null) findAllByActors(filterFilm.actors) else null
 
         val filmByCreators = if (filterFilm.creators != null) findAllByCreators(filterFilm.creators) else null
@@ -100,6 +103,8 @@ class FilmService(
         if (filmByCreators != null) intersected = intersected.intersect(filmByCreators)
 
         if (filmByGenres != null) intersected = intersected.intersect(filmByGenres)
+
+        if (filmBySearchQuery != null) intersected = intersected.intersect(filmBySearchQuery)
 
         return intersected
     }

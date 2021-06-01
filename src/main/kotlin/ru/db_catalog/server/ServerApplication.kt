@@ -29,7 +29,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.GenericFilterBean
 import ru.db_catalog.server.user.RoleEntity
-import ru.db_catalog.server.user.RoleService
 import ru.db_catalog.server.user.User
 import ru.db_catalog.server.user.UserService
 import java.time.LocalDate
@@ -160,15 +159,15 @@ class CustomUserDetails(user: User, roles: Set<RoleEntity>) : UserDetails {
 }
 
 @Component
-class CustomUserDetailsService(val userService: UserService, val roleService: RoleService) : UserDetailsService {
+class CustomUserDetailsService(val userService: UserService) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): CustomUserDetails? {
         val user = userService.findByUsername(username)
         val role = if (user != null) {
             if (user.role == 2L)
-                setOf(roleService.findById(user.role).get(), roleService.findById(1).get())
+                setOf(userService.findRoleById(user.role).get(), userService.findRoleById(1).get())
             else
-                setOf(roleService.findById(user.role).get())
+                setOf(userService.findRoleById(user.role).get())
         } else emptySet()
         return user?.let { CustomUserDetails(it, role) }
     }
