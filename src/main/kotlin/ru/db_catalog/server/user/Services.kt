@@ -60,11 +60,11 @@ class UserService(
 
     fun getMusicNamesByIds(ids: Set<Long>) = musicRepository.findIdNameByIds(ids)
 
-    fun getUserRecommendedBook(genres: Set<Long>): Set<Long> = userRepository.getUserRecommendedBook(genres)
+    fun getUserRecommendedBook(genres: Set<Long>, viewed: Set<Long>): Set<Long> = userRepository.getUserRecommendedBook(genres, viewed)
 
-    fun getUserRecommendedFilm(genres: Set<Long>): Set<Long> = userRepository.getUserRecommendedFilm(genres)
+    fun getUserRecommendedFilm(genres: Set<Long>, viewed: Set<Long>): Set<Long> = userRepository.getUserRecommendedFilm(genres, viewed)
 
-    fun getUserRecommendedMusic(genres: Set<Long>): Set<Long> = userRepository.getUserRecommendedMusic(genres)
+    fun getUserRecommendedMusic(genres: Set<Long>, viewed: Set<Long>): Set<Long> = userRepository.getUserRecommendedMusic(genres, viewed)
 
     fun findRoleById(id: Long) = roleRepository.findById(id)
 

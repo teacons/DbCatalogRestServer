@@ -79,15 +79,18 @@ class UserMediaGetterController(
         val ids = when (type) {
             "book" -> {
                 val genres = user.likedBookGenres.map { it.bookGenreId }.toSet()
-                userService.getUserRecommendedBook(genres).sorted()
+                val viewed = user.viewedBook.map { it.bookId }.toSet()
+                userService.getUserRecommendedBook(genres, viewed).sorted()
             }
             "film" -> {
                 val genres = user.likedFilmGenres.map { it.filmGenreId }.toSet()
-                userService.getUserRecommendedFilm(genres).sorted()
+                val viewed = user.viewedFilm.map { it.filmId }.toSet()
+                userService.getUserRecommendedFilm(genres, viewed).sorted()
             }
             "music" -> {
                 val genres = user.likedMusicGenres.map { it.musicGenreId }.toSet()
-                userService.getUserRecommendedMusic(genres).sorted()
+                val viewed = user.viewedMusic.map { it.musicId }.toSet()
+                userService.getUserRecommendedMusic(genres, viewed).sorted()
             }
             else -> throw IllegalArgumentException("getRecommended: bad type")
         }
