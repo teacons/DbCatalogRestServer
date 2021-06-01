@@ -45,6 +45,9 @@ interface MusicRepository : CrudRepository<Music, Long> {
     @Query("select id from music where lower(music.name) like :name")
     fun findIdAllByNameLikeIgnoreCase(name: String) : Set<Long>
 
+    @Query("with tmp as (select distinct id, round(avg(rating) OVER (PARTITION BY music_id), 2) as music_rating from user_viewed_music full join music on user_viewed_music.music_id = music.id) select id from tmp where music_rating is NULL")
+    fun findAllRatingIsNull(): Set<Long>
+
 }
 
 @Repository

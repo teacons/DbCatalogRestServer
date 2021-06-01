@@ -42,6 +42,9 @@ interface BookRepository : CrudRepository<Book, Long> {
     @Query("select id from book where lower(book.name) like :name")
     fun findIdAllByNameLikeIgnoreCase(name: String) : Set<Long>
 
+    @Query("with tmp as (select distinct id, round(avg(rating) OVER (PARTITION BY book_id), 2) as book_rating from user_viewed_book full join  book b on user_viewed_book.book_id = b.id) select id from tmp where book_rating is NULL")
+    fun findAllRatingIsNull(): Set<Long>
+
 }
 
 @Repository

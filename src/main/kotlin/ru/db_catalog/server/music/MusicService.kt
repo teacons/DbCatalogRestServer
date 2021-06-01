@@ -63,6 +63,8 @@ class MusicService(
 
     fun findAllByRatings(ratings: Pair<Int, Int>) = musicRepository.findAllByRatings(ratings.first, ratings.second)
 
+    fun findAllRatingIsNull() = musicRepository.findAllRatingIsNull()
+
     fun findAllByDuration(duration: Pair<Int, Int>) = musicRepository.findAllByDuration(duration.first, duration.second)
 
     fun findAllByGenres(genres: Set<Long>) = musicRepository.findAllByGenres(genres)
@@ -80,7 +82,10 @@ class MusicService(
     fun filterMusic(filterMusic: MusicFilter): Set<Long> {
         val musicByYears = getMusicByYears(filterMusic.years)
 
-        val musicByRating = findAllByRatings(filterMusic.ratings)
+        val musicByRating = findAllByRatings(filterMusic.ratings).toMutableSet()
+
+        if (filterMusic.ratings.first == 0)
+            musicByRating += findAllRatingIsNull()
 
         val musicByDuration = findAllByDuration(filterMusic.duration)
 

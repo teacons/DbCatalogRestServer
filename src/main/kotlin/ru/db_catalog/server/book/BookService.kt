@@ -36,6 +36,8 @@ class BookService(
 
     fun findAllByRatings(ratings: Pair<Int, Int>) = bookRepository.findAllByRatings(ratings.first, ratings.second)
 
+    fun findAllRatingIsNull() = bookRepository.findAllRatingIsNull()
+
     fun findAllByAuthors(authors: Set<Long>) = bookRepository.findAllByAuthors(authors)
 
     fun findAllByGenres(genres: Set<Long>) = bookRepository.findAllByGenres(genres)
@@ -73,7 +75,10 @@ class BookService(
 
         val bookByYears = getBooksBetweenYears(filterBook.years)
 
-        val bookByRating = findAllByRatings(filterBook.ratings)
+        val bookByRating = findAllByRatings(filterBook.ratings).toMutableSet()
+
+        if (filterBook.ratings.first == 0)
+            bookByRating += findAllRatingIsNull()
 
         val bookBySearchQuery =
             if (filterBook.searchQuery != null) findAllBooksIdsByName("%${filterBook.searchQuery.toLowerCase()}%") else null

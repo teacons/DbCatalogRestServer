@@ -40,6 +40,8 @@ class FilmService(
 
     fun findFilmsByRatings(ratings: Pair<Int, Int>) = filmRepository.findAllByRatings(ratings.first, ratings.second)
 
+    fun findAllRatingIsNull() = filmRepository.findAllRatingIsNull()
+
     fun findAllByActors(actors: Set<Long>) = filmRepository.findAllByActors(actors)
 
     fun findAllByCreators(creators: Set<Long>) = filmRepository.findAllByCreators(creators)
@@ -83,7 +85,10 @@ class FilmService(
     fun filterFilm(filterFilm: FilterFilm): Set<Long> {
         val filmByYears = getFilmsBetweenYears(filterFilm.years)
 
-        val filmByRating = findFilmsByRatings(filterFilm.ratings)
+        val filmByRating = findFilmsByRatings(filterFilm.ratings).toMutableSet()
+
+        if (filterFilm.ratings.first == 0)
+            filmByRating += findAllRatingIsNull()
 
         val filmByDuration = findAllByDuration(filterFilm.duration)
 

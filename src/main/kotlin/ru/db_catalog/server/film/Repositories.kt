@@ -47,6 +47,8 @@ interface FilmRepository : CrudRepository<Film, Long> {
     @Query("select id from film where lower(film.name) like :name")
     fun findIdAllByNameLikeIgnoreCase(name: String) : Set<Long>
 
+    @Query("with tmp as (select distinct id, round(avg(rating) OVER (PARTITION BY film_id), 2) as film_rating from user_viewed_film full join film on user_viewed_film.film_id = film.id) select id from tmp where film_rating is NULL")
+    fun findAllRatingIsNull(): Set<Long>
 
 }
 
