@@ -34,13 +34,22 @@ interface UserRepository : CrudRepository<User, Long> {
     fun getUserFilmRating(@Param("userId") userId: Long, @Param("filmId") filmId: Long): Double?
 
     @Query("select distinct id from book join book_has_book_genre on book.id = book_has_book_genre.book_id where book_genre_id in (:genres) and book.id not in (:viewed)")
-    fun getUserRecommendedBook(@Param("genres") genres: Set<Long>, @Param("viewed") viewed: Set<Long>): Set<Long>
+    fun getUserRecommendedBookWithViewed(@Param("genres") genres: Set<Long>, @Param("viewed") viewed: Set<Long>): Set<Long>
+
+    @Query("select distinct id from book join book_has_book_genre on book.id = book_has_book_genre.book_id where book_genre_id in (:genres)")
+    fun getUserRecommendedBook(@Param("genres") genres: Set<Long>): Set<Long>
 
     @Query("select distinct id from film join film_has_film_genre on film.id = film_has_film_genre.film_id where film_genre_id in (:genres) and film.id not in (:viewed)")
-    fun getUserRecommendedFilm(@Param("genres") genres: Set<Long>, @Param("viewed") viewed: Set<Long>): Set<Long>
+    fun getUserRecommendedFilmWithViewed(@Param("genres") genres: Set<Long>, @Param("viewed") viewed: Set<Long>): Set<Long>
+
+    @Query("select distinct id from film join film_has_film_genre on film.id = film_has_film_genre.film_id where film_genre_id in (:genres)")
+    fun getUserRecommendedFilm(@Param("genres") genres: Set<Long>): Set<Long>
 
     @Query("select distinct id from music join music_has_music_genre on music.id = music_has_music_genre.music_id where music_genre_id in (:genres) and music.id not in (:viewed)")
-    fun getUserRecommendedMusic(@Param("genres") genres: Set<Long>, @Param("viewed") viewed: Set<Long>): Set<Long>
+    fun getUserRecommendedMusicWithViewed(@Param("genres") genres: Set<Long>, @Param("viewed") viewed: Set<Long>): Set<Long>
+
+    @Query("select distinct id from music join music_has_music_genre on music.id = music_has_music_genre.music_id where music_genre_id in (:genres)")
+    fun getUserRecommendedMusic(@Param("genres") genres: Set<Long>): Set<Long>
 
 
 }
